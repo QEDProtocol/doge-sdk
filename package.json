@@ -4,7 +4,7 @@
   "description": "An ultra lightweight, feature rich, dogecoin library for Node.js and the browser.",
   "module": "dist/doge-sdk.esm.js",
   "homepage": "https://github.com/QEDProtocol/doge-sdk#readme",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -17,7 +17,7 @@
     "url": "https://github.com/QEDProtocol/doge-sdk.git"
   },
   "engines": {
-    "node": ">=10.4.0"
+    "node": ">=14.4.0"
   },
   "scripts": {
     "start": "tsdx watch",

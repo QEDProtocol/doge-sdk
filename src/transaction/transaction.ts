@@ -22,7 +22,7 @@ class Transaction implements ITransaction {
     inputs: ITransactionInput[],
     outputs: ITransactionOutput[],
     locktime = 0,
-    version = 2
+    version = 1
   ) {
     this.version = version;
     this.inputs = inputs;
@@ -33,7 +33,7 @@ class Transaction implements ITransaction {
     inputs: ITransactionInputWithoutScript[],
     outputs: ITransactionOutput[],
     locktime = 0,
-    version = 2
+    version = 1
   ) {
     const placeholderInputs = inputs.map((input) => ({
       ...input,

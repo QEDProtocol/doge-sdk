@@ -4,6 +4,7 @@ import { getP2SHOutputScript } from "../address";
 import { hashBuffer } from "../hash";
 import { assembleBitcoinScript, disassembleScript } from "../script";
 import { hexToU8Array, u8ArrayToHex } from "../utils/data";
+import { IDogeSignatureRequest } from "../wallet/types";
 import {
   ITransactionBuilderInput,
   INormalizedTransactionBuilderInput,
@@ -124,13 +125,25 @@ class TransactionBuilder {
 
       if (Array.isArray(signers)) {
         for (const signer of signers) {
-          const sig = await (signer.canSignHash()
-            ? signer.signHash(u8ArrayToHex(sigHash))
-            : signer.signTransaction(Transaction.fromBuffer(sigHashPreimage)));
-          newSignatures.push({
-            pubkey: hexToU8Array(sig.publicKey),
-            signature: hexToU8Array(sig.signature + sigHashTypeByteHex),
-          });
+          if(signer.canSignHash()){
+            const sig = await signer.signHash(u8ArrayToHex(sigHash));
+            newSignatures.push({
+              pubkey: hexToU8Array(sig.publicKey),
+              signature: hexToU8Array(sig.signature + sigHashTypeByteHex),
+            });
+          }else{
+            const tx = Transaction.fromBuffer(sigHashPreimage);
+            const request: IDogeSignatureRequest = {
+              transaction: tx,
+              sigHashType,
+              inputIndex: i,
+            };
+            const sig = await signer.signTransaction(request);
+            newSignatures.push({
+              pubkey: hexToU8Array(sig.publicKey),
+              signature: hexToU8Array(sig.signature + sigHashTypeByteHex),
+            });
+          }
         }
       }
 

@@ -4,7 +4,7 @@ import { hexToU8Array, u8ArrayToHex } from "../../utils/data";
 import { getDogeNetworkById } from "../../networks";
 import { decodePrivateKeyAndNetworkFromWIF, encodePrivateKeyToWIF, getP2PKHAddressFromPublicKey } from "../../address";
 import { cryptoRandomBytes } from "../../utils/random";
-import { IDogeTransactionSigner, IDogeWalletSerialized, ISignatureResult } from "../types";
+import { IDogeSignatureRequest, IDogeTransactionSigner, IDogeWalletSerialized, ISignatureResult } from "../types";
 import { Transaction } from "../../transaction";
 import { derEncodeBigIntSignature } from "../../ecc";
 
@@ -41,7 +41,7 @@ class DogeMemoryWallet implements IDogeTransactionSigner{
       signature: u8ArrayToHex(result),
     };
   }
-  signTransaction(_tx: Transaction): Promise<ISignatureResult> {
+  signTransaction(_signatureRequest: IDogeSignatureRequest): Promise<ISignatureResult> {
     // we don't need to implement this because canSignHash is true
     throw new Error("Method not implemented.");
   }

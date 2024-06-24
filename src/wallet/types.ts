@@ -1,13 +1,21 @@
 import { Transaction } from "../transaction";
+
 interface ISignatureResult {
   publicKey: string;
   signature: string;
 }
+
+interface IDogeSignatureRequest {
+  transaction: Transaction;
+  sigHashType: number;
+  inputIndex: number;
+}
+
 interface IDogeTransactionSigner {
   getCompressedPublicKey(): Promise<string>;
   canSignHash(): boolean;
   signHash(hashHex: string): Promise<ISignatureResult>;
-  signTransaction(tx: Transaction): Promise<ISignatureResult>;
+  signTransaction(signatureRequest: IDogeSignatureRequest): Promise<ISignatureResult>;
 }
 
 interface IDogeWalletProvider {
@@ -33,4 +41,5 @@ export type {
   IDogeWalletProvider,
   IDogeWalletSerialized,
   IFullDogeWalletProvider,
+  IDogeSignatureRequest,
 }

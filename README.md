@@ -306,25 +306,9 @@ const rpc = new DogeLinkRPC("http://devnet:devnet@localhost:1337/bitcoin-rpc/?ne
 ```
 
 ### Hardware/Third Party Wallet Support
-To implement a hardware wallet you need to implement the interfaces `IDogeTransactionSigner` and `IDogeWalletProvider` (see [src/wallet/types.ts](./src/wallet/types.ts)):
-```typescript
-interface ISignatureResult {
-  publicKey: string;
-  signature: string;
-}
-interface IDogeTransactionSigner {
-  getCompressedPublicKey(): Promise<string>;
-  canSignHash(): boolean;
-  signHash(hashHex: string): Promise<ISignatureResult>;
-  signTransaction(tx: Transaction): Promise<ISignatureResult>;
-}
+To implement a hardware wallet you need to implement the interfaces `IDogeTransactionSigner` and `IDogeWalletProvider` (see [src/wallet/types.ts](./src/wallet/types.ts)).
 
-interface IDogeWalletProvider {
-  getSigners(): Promise<IDogeTransactionSigner[]>;
-}
-```
-In the short future, we will be releasing compatible packages for ledger and trezor.
-
+You can find an end-to-end example of implementing a doge wallet provider for ledger in [docs/ThirdPartyWallets.md](./docs/ThirdPartyWallets.md). 
 
 ## FAQ
 ### How do I get a doge RPC API URL

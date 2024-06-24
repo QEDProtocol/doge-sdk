@@ -179,9 +179,9 @@ async function exampleComplexP2SH(){
   const wallet1 = walletProvider.addRandomWallet(networkId);
   console.log("wallet 1 address: ", wallet1.address);
   const wallet2 = walletProvider.addRandomWallet(networkId);
-  console.log("wallet 2 address: ", wallet1.address);
+  console.log("wallet 2 address: ", wallet2.address);
   const wallet3 = walletProvider.addRandomWallet(networkId);
-  console.log("wallet 3 address: ", wallet1.address);
+  console.log("wallet 3 address: ", wallet3.address);
 
   // create a secret string and hash it
   const secretString = "hello world";

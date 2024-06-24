@@ -40,7 +40,7 @@ npm install doge-sdk
 
 ### P2PKH
 ```typescript
-import { DogeLinkRPC, DogeMemoryWalletProvider, createP2PKHTransaction } from "@qstudio/doge-sdk";
+import { DogeLinkRPC, DogeMemoryWalletProvider, createP2PKHTransaction } from "doge-sdk";
 
 async function exampleP2PKH(){
   // networkId can be doge, dogeTestnet, or dogeRegtest
@@ -90,7 +90,7 @@ async function exampleP2PKH(){
 
 ### Simple P2SH Puzzle
 ```typescript
-import { DogeLinkRPC, DogeMemoryWalletProvider, createP2SHTransaction, getP2SHAddress } from "@qstudio/doge-sdk";
+import { DogeLinkRPC, DogeMemoryWalletProvider, createP2SHTransaction, getP2SHAddress } from "doge-sdk";
 
 async function exampleP2SH(){
   // networkId can be doge, dogeTestnet, or dogeRegtest
@@ -156,7 +156,7 @@ async function exampleP2SH(){
 
 ### Complex P2SH Puzzle with Signature + Secret Preimage Reveal
 ```typescript
-import { DogeLinkRPC, DogeMemoryWalletProvider, createP2PKHTransaction, createP2SHTransaction, getP2SHAddress, hashBuffer } from "@qstudio/doge-sdk";
+import { DogeLinkRPC, DogeMemoryWalletProvider, createP2PKHTransaction, createP2SHTransaction, getP2SHAddress, hashBuffer } from "doge-sdk";
 
 
 async function exampleComplexP2SH(){

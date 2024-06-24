@@ -9,7 +9,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/QEDProtocol/doge-sdk">
-  <img width="256" height="256" src="https://github.com/QEDProtocol/doge-sdk/raw/main/static/doge-sdk-logo.png?raw=true">
+  <img width="256" height="256" src="https://github.com/QEDProtocol/doge-sdk/raw/main/docs/static/doge-sdk-logo.png?raw=true">
   </a>
 
   <h2 align="center">doge-sdk</h2>

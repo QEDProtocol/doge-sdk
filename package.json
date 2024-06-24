@@ -1,0 +1,60 @@
+{
+  "name": "doge-sdk",
+  "author": "QED Protocol",
+  "description": "An ultra lightweight, feature rich, dogecoin library for Node.js and the browser.",
+  "module": "dist/doge-sdk.esm.js",
+  "version": "0.0.1",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=10.4.0"
+  },
+  "scripts": {
+    "start": "tsdx watch",
+    "build": "tsdx build",
+    "test": "tsdx test",
+    "lint": "tsdx lint",
+    "prepare": "tsdx build",
+    "size": "size-limit",
+    "analyze": "size-limit --why"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "tsdx lint"
+    }
+  },
+  "prettier": {
+    "printWidth": 80,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
+  "size-limit": [
+    {
+      "path": "dist/doge-sdk.cjs.production.min.js",
+      "limit": "100 KB"
+    },
+    {
+      "path": "dist/doge-sdk.esm.js",
+      "limit": "100 KB"
+    }
+  ],
+  "dependencies": {
+    "@noble/secp256k1": "2.1.0"
+  },
+  "devDependencies": {
+    "@size-limit/preset-small-lib": "^8.2.4",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.14.8",
+    "husky": "^8.0.3",
+    "size-limit": "^8.2.4",
+    "tsdx": "^0.14.1",
+    "tslib": "^2.5.0",
+    "typescript": "^4.9.5"
+  }
+}

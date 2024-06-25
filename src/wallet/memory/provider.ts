@@ -22,7 +22,7 @@ class DogeMemoryWalletProvider implements IDogeWalletProvider {
   getAbilities(): IWalletProviderAbilities {
     return {
       addWalletRandom: true,
-      addWalletFromWIF: true,
+      addWalletBIP178: true,
     }
   }
   getSigners(): Promise<IDogeTransactionSigner[]> {

@@ -12,13 +12,16 @@ import {
   IFullDogeWalletProvider,
 } from "./types";
 
-class FullDogeWalletProvider implements IFullDogeWalletProvider {
-  base: IDogeWalletProvider;
+class FullDogeWalletProvider<T extends IDogeWalletProvider> implements IFullDogeWalletProvider<T> {
+  base: T;
   cache: { signer: IDogeTransactionSigner; publicKey: string }[] = [];
   useCacheByDefault: boolean;
-  constructor(base: IDogeWalletProvider, useCacheByDefault = false) {
+  constructor(base: T, useCacheByDefault = false) {
     this.base = base;
     this.useCacheByDefault = useCacheByDefault;
+  }
+  getBaseProvider(): T {
+    return this.base;
   }
   shouldUseCache(useCached?: boolean) {
     if (typeof useCached === "undefined") {

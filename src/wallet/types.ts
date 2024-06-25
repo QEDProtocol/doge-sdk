@@ -22,11 +22,12 @@ interface IDogeWalletProvider {
   getSigners(): Promise<IDogeTransactionSigner[]>;
 }
 
-interface IFullDogeWalletProvider extends IDogeWalletProvider {
+interface IFullDogeWalletProvider<T extends IDogeWalletProvider> extends IDogeWalletProvider {
   getCompressedPublicKeys(useCache?: boolean): Promise<string[]>;
   getSignerForPublicKey(compressedPublicKeyHex: string, useCache?: boolean): Promise<IDogeTransactionSigner>;
   getP2PKHAddresses(networkId: string, useCache?: boolean): Promise<{ address: string; publicKey: string }[]>;
   getSignerForAddress(address: string, useCache?: boolean): Promise<IDogeTransactionSigner>;
+  getBaseProvider(): T;
 }
 
 interface IDogeWalletSerialized {

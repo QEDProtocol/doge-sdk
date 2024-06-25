@@ -1,3 +1,4 @@
+import { DogeNetworkId } from "../networks/types";
 import { Transaction } from "../transaction";
 
 interface ISignatureResult {
@@ -16,10 +17,23 @@ interface IDogeTransactionSigner {
   canSignHash(): boolean;
   signHash(hashHex: string): Promise<ISignatureResult>;
   signTransaction(signatureRequest: IDogeSignatureRequest): Promise<ISignatureResult>;
+  getPrivateKeyWIF?(): Promise<string>;
+}
+
+interface IWalletProviderAbilities {
+  addWalletRandom?: boolean;
+  addWalletFromWIF?: boolean;
+  addWalletFromSeed?: boolean;
+  addWalletFromMnemonic?: boolean;
 }
 
 interface IDogeWalletProvider {
   getSigners(): Promise<IDogeTransactionSigner[]>;
+  addWalletRandom?(networkId: DogeNetworkId): Promise<IDogeTransactionSigner>;
+  addWalletBIP39?(networkId: DogeNetworkId, seedPhrase: string, password?: string): Promise<IDogeTransactionSigner>;
+  addWalletBIP44?(networkId: DogeNetworkId, fullDerivationPath: string): Promise<IDogeTransactionSigner>;
+  addWalletBIP178?(networkId: DogeNetworkId, wif: string): Promise<IDogeTransactionSigner>;
+  getAbilities(): IWalletProviderAbilities;
 }
 
 interface IFullDogeWalletProvider<T extends IDogeWalletProvider> extends IDogeWalletProvider {
@@ -43,4 +57,5 @@ export type {
   IDogeWalletSerialized,
   IFullDogeWalletProvider,
   IDogeSignatureRequest,
+  IWalletProviderAbilities,
 }

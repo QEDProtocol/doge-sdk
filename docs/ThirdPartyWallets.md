@@ -4,26 +4,29 @@ Implementing hardware wallet support for doge-sdk is easy, just implement the in
 
 ```typescript
 
-interface ISignatureResult {
-  publicKey: string;
-  signature: string;
-}
-
-interface IDogeSignatureRequest {
-  transaction: Transaction;
-  sigHashType: number;
-  inputIndex: number;
-}
 
 interface IDogeTransactionSigner {
   getCompressedPublicKey(): Promise<string>;
   canSignHash(): boolean;
   signHash(hashHex: string): Promise<ISignatureResult>;
   signTransaction(signatureRequest: IDogeSignatureRequest): Promise<ISignatureResult>;
+  getPrivateKeyWIF?(): Promise<string>;
+}
+
+interface IWalletProviderAbilities {
+  addWalletRandom?: boolean;
+  addWalletFromWIF?: boolean;
+  addWalletFromSeed?: boolean;
+  addWalletFromMnemonic?: boolean;
 }
 
 interface IDogeWalletProvider {
   getSigners(): Promise<IDogeTransactionSigner[]>;
+  addWalletRandom?(networkId: DogeNetworkId): Promise<IDogeTransactionSigner>;
+  addWalletBIP39?(networkId: DogeNetworkId, seedPhrase: string, password?: string): Promise<IDogeTransactionSigner>;
+  addWalletBIP44?(networkId: DogeNetworkId, fullDerivationPath: string): Promise<IDogeTransactionSigner>;
+  addWalletBIP178?(networkId: DogeNetworkId, wif: string): Promise<IDogeTransactionSigner>;
+  getAbilities(): IWalletProviderAbilities;
 }
 
 ```
@@ -206,7 +209,7 @@ class LedgerHardwareWalletProvider implements IDogeWalletProvider {
     for (let i = 0; i < numberOfWallets; i++) {
       this.signers.push(
         new LedgerHardwareWalletSigner(
-          "44'/0'/" + i + "'/0/0",
+          "44'/3'/" + i + "'/0/0",
           rpc,
           ledgerInstance
         )
@@ -217,6 +220,9 @@ class LedgerHardwareWalletProvider implements IDogeWalletProvider {
 
   getSigners(): Promise<IDogeTransactionSigner[]> {
     return Promise.resolve(this.signers);
+  }
+  getAbilities(): IWalletProviderAbilities {
+    return {};
   }
 }
 export { LedgerHardwareWalletProvider, LedgerHardwareWalletSigner };

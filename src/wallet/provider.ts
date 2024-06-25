@@ -10,6 +10,7 @@ import {
   IDogeTransactionSigner,
   IDogeWalletProvider,
   IFullDogeWalletProvider,
+  IWalletProviderAbilities,
 } from "./types";
 
 class FullDogeWalletProvider<T extends IDogeWalletProvider> implements IFullDogeWalletProvider<T> {
@@ -19,6 +20,37 @@ class FullDogeWalletProvider<T extends IDogeWalletProvider> implements IFullDoge
   constructor(base: T, useCacheByDefault = false) {
     this.base = base;
     this.useCacheByDefault = useCacheByDefault;
+  }
+  addWalletRandom(networkId: DogeNetworkId): Promise<IDogeTransactionSigner> {
+    if(this.base.addWalletRandom){
+      return this.base.addWalletRandom(networkId);
+    }else{
+      throw new Error("addWalletRandom not supported for this provider.");
+    } 
+  }
+  addWalletBIP39(networkId: DogeNetworkId, seedPhrase: string, password?: string | undefined): Promise<IDogeTransactionSigner> {
+    if(this.base.addWalletBIP39){
+      return this.base.addWalletBIP39(networkId, seedPhrase, password);
+    }else{
+      throw new Error("addWalletBIP39 not supported for this provider.");
+    }
+  }
+  addWalletBIP44(networkId: DogeNetworkId, fullDerivationPath: string): Promise<IDogeTransactionSigner> {
+    if(this.base.addWalletBIP44){
+      return this.base.addWalletBIP44(networkId, fullDerivationPath);
+    }else{
+      throw new Error("addWalletBIP44 not supported for this provider.");
+    }
+  }
+  addWalletBIP178(networkId: DogeNetworkId, wif: string): Promise<IDogeTransactionSigner> {
+    if(this.base.addWalletBIP44){
+      return this.base.addWalletBIP44(networkId, wif);
+    }else{
+      throw new Error("addWalletBIP44 not supported for this provider.");
+    }
+  }
+  getAbilities(): IWalletProviderAbilities {
+    return this.base.getAbilities();
   }
   getBaseProvider(): T {
     return this.base;

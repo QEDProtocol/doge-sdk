@@ -1,11 +1,29 @@
 import { DogeNetworkId } from "../../networks/types";
-import { IDogeTransactionSigner, IDogeWalletProvider, IDogeWalletSerialized } from "../types";
+import { IDogeTransactionSigner, IDogeWalletProvider, IDogeWalletSerialized, IWalletProviderAbilities } from "../types";
 import { DogeMemoryWallet } from "./wallet";
 
 class DogeMemoryWalletProvider implements IDogeWalletProvider {
   wallets: DogeMemoryWallet[];
   constructor(wallets: DogeMemoryWallet[] = []) {
     this.wallets = wallets;
+  }
+  async addWalletRandom(networkId: DogeNetworkId): Promise<IDogeTransactionSigner> {
+    return this.addRandomWallet(networkId);
+  }
+  addWalletBIP39(networkId: DogeNetworkId, seedPhrase: string, password?: string | undefined): Promise<IDogeTransactionSigner> {
+    throw new Error("addWalletBIP39 not supported for this provider.");
+  }
+  addWalletBIP44(networkId: DogeNetworkId, fullDerivationPath: string): Promise<IDogeTransactionSigner> {
+    throw new Error("addWalletBIP44 not supported for this provider.");
+  }
+  async addWalletBIP178(networkId: DogeNetworkId, wif: string): Promise<IDogeTransactionSigner> {
+    return this.addWalletFromWIF(wif, networkId);
+  }
+  getAbilities(): IWalletProviderAbilities {
+    return {
+      addWalletRandom: true,
+      addWalletFromWIF: true,
+    }
   }
   getSigners(): Promise<IDogeTransactionSigner[]> {
     return Promise.resolve(this.wallets);

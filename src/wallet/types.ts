@@ -22,9 +22,9 @@ interface IDogeTransactionSigner {
 
 interface IWalletProviderAbilities {
   addWalletRandom?: boolean;
-  addWalletFromWIF?: boolean;
-  addWalletFromSeed?: boolean;
-  addWalletFromMnemonic?: boolean;
+  addWalletBIP39?: boolean;
+  addWalletBIP44?: boolean;
+  addWalletBIP178?: boolean;
 }
 
 interface IDogeWalletProvider {

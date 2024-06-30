@@ -1,6 +1,6 @@
 import { decodeAddress, getP2PKHOutputScript, getAddressFromP2PKHOutputScript } from "../../address";
 import { hashHex } from "../../hash";
-import { DogeLinkRPC } from "../../rpc";
+import { IDogeLinkRPC } from "../../rpc/types";
 import { TransactionBuilder } from "../../transaction/builder";
 import { normailzeTransactionOutput } from "../../transaction/normalize";
 import { ITransactionOutputUser } from "../../transaction/types";
@@ -42,7 +42,7 @@ async function createP2PKHTransactionAsync(signer: IDogeTransactionSigner, param
     return createP2PKHTransactionInternal(signer, publicKeyHash, params.inputs, params.outputs);
   }
 }
-async function resolveP2PKHParams(rpc: DogeLinkRPC, signer: IDogeTransactionSigner, params: ICreateP2PKHRPCParams): Promise<ICreateP2PKHParams> {
+async function resolveP2PKHParams(rpc: IDogeLinkRPC, signer: IDogeTransactionSigner, params: ICreateP2PKHRPCParams): Promise<ICreateP2PKHParams> {
   const resolver = new P2PKHTransactionInfoResolver(signer, params.inputs, params.address, rpc);
   const {inputs, lastOutputScript} = await resolver.resolveInputs();
   const address = getAddressFromP2PKHOutputScript(lastOutputScript, rpc.getNetwork().networkId);

@@ -74,8 +74,27 @@ export type {
   IUTXO,
   IBaseUTXO,
   IDogeLinkRPCInfo,
+  IDogeLinkRPC,
 } from './rpc/types';
 export * from './rpc';
+
+export type {
+  ITxVout,
+  ITxVin,
+  ITxConfirmedStatusFalse,
+  ITxConfirmedStatusTrue,
+  ITXConfirmedStatus,
+  IGetTXResponse,
+  IBasicBlock,
+  IBlockStatus,
+  IAddressStats,
+  IAddressStatsResponse,
+  IScriptHashStatsResponse,
+  IMempoolStatus,
+  IMempoolRecentTransaction,
+  ITransactionOutSpend,
+  IDogeLinkElectrsRPC,
+} from './rpc/electrsTypes';
 
 
 export type {

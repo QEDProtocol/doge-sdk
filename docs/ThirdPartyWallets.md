@@ -36,7 +36,7 @@ interface IDogeWalletProvider {
 For example, here is a reference implementation for a Ledger hardware wallet:
 ```typescript
 import {
-  DogeLinkRPC,
+  IDogeLinkRPC,
   IDogeTransactionSigner,
   IDogeWalletProvider,
   ISignatureResult,
@@ -54,10 +54,10 @@ class LedgerHardwareWalletSigner implements IDogeTransactionSigner {
   walletPath: string;
   ledgerInstance: LedgerBitcoinApp;
   cachedPublicKey: string = "";
-  rpc: DogeLinkRPC;
+  rpc: IDogeLinkRPC;
   constructor(
     walletPath: string,
-    rpc: DogeLinkRPC,
+    rpc: IDogeLinkRPC,
     ledgerInstance: LedgerBitcoinApp
   ) {
     this.walletPath = walletPath;
@@ -197,10 +197,10 @@ class LedgerHardwareWalletProvider implements IDogeWalletProvider {
   numberOfWallets: number;
   ledgerInstance: LedgerBitcoinApp;
   signers: LedgerHardwareWalletSigner[] = [];
-  rpc: DogeLinkRPC;
+  rpc: IDogeLinkRPC;
 
   constructor(
-    rpc: DogeLinkRPC,
+    rpc: IDogeLinkRPC,
     ledgerInstance: LedgerBitcoinApp,
     numberOfWallets = 8
   ) {

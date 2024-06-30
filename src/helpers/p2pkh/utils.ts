@@ -1,6 +1,6 @@
 import { decodeAddress, getP2PKHOutputScript, getAddressFromP2PKHOutputScript } from "../../address";
 import { hashHex } from "../../hash";
-import { DogeLinkRPC } from "../../rpc";
+import { IDogeLinkRPC } from "../../rpc/types";
 import { Transaction } from "../../transaction";
 import { seq } from "../../utils/misc";
 import { IDogeTransactionSigner } from "../../wallet/types";
@@ -12,7 +12,7 @@ function isNormalizedFundingUTXO(input: IP2PKHFundingUTXOInput): input is IP2PKH
 
 class P2PKHTransactionInfoResolver {
   inputs: IP2PKHFundingUTXOInput[];
-  rpc?: DogeLinkRPC;
+  rpc?: IDogeLinkRPC;
   signer: IDogeTransactionSigner;
   unresolvedInputIndexes: number[];
   resolvedTransactions: Record<number, Transaction> = {};
@@ -20,7 +20,7 @@ class P2PKHTransactionInfoResolver {
   resolvedInputIndexes: number[] = [];
   address: string | undefined;
   lastOutputScript?: Uint8Array;
-  constructor(signer: IDogeTransactionSigner, inputs: IP2PKHFundingUTXOInput[], address?: string | undefined, rpc?: DogeLinkRPC) {
+  constructor(signer: IDogeTransactionSigner, inputs: IP2PKHFundingUTXOInput[], address?: string | undefined, rpc?: IDogeLinkRPC) {
     this.inputs = inputs;
     this.rpc = rpc;
     this.signer = signer;

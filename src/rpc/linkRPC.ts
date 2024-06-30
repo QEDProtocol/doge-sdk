@@ -6,9 +6,9 @@ import { Transaction } from "../transaction";
 import { hexToU8Array } from "../utils/data";
 import { seq } from "../utils/misc";
 import { parseDogeLinkNetworkURI } from "./parseNetwork";
-import { IDogeLinkRPCInfo } from "./types";
+import { IDogeLinkRPC, IDogeLinkRPCInfo } from "./types";
 
-class DogeLinkRPC {
+class DogeLinkRPC implements IDogeLinkRPC {
   rpcInfo: IDogeLinkRPCInfo;
   httpClient: IDogeHTTPClient;
 
@@ -100,7 +100,7 @@ class DogeLinkRPC {
     } else {
       // disable mine blocks for non regtest networks
       return Promise.resolve(
-        "0000000000000000000000000000000000000000000000000000000000000000"
+        ["0000000000000000000000000000000000000000000000000000000000000000"]
       );
     }
   }

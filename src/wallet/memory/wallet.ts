@@ -1,4 +1,4 @@
-import { getPublicKey, signAsync } from "@noble/secp256k1";
+import { getPublicKey, sign, signAsync } from "@noble/secp256k1";
 import { DogeNetworkId, IDogeNetwork } from "../../networks/types";
 import { hexToU8Array, u8ArrayToHex } from "../../utils/data";
 import { getDogeNetworkById } from "../../networks";
@@ -7,6 +7,7 @@ import { cryptoRandomBytes } from "../../utils/random";
 import { IDogeSignatureRequest, IDogeTransactionSigner, IDogeWalletSerialized, ISignatureResult } from "../types";
 import { Transaction } from "../../transaction";
 import { derEncodeBigIntSignature } from "../../ecc";
+import { hashHex } from "../../hash";
 
 class DogeMemoryWallet implements IDogeTransactionSigner{
   privateKey: Uint8Array;
@@ -32,9 +33,12 @@ class DogeMemoryWallet implements IDogeTransactionSigner{
   canSignHash(): boolean {
     return true;
   }
-  async signHash(hashHex: string): Promise<ISignatureResult> {
-    const hash = hexToU8Array(hashHex);
-    const sig = await signAsync(hash, this.privateKey);
+  async signHash(hash: string, signSha256?: boolean): Promise<ISignatureResult> {
+    if(signSha256){
+      return this.signHash(hashHex("sha256", hash, "hex"));
+    }
+    const realHash = hexToU8Array(hash);
+    const sig = await signAsync(realHash, this.privateKey);
     const result = derEncodeBigIntSignature(sig.r, sig.s);
     return {
       publicKey: this.compressedPublicKeyHex,

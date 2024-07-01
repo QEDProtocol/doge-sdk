@@ -10,7 +10,7 @@ import {
   IDogeTransactionSigner,
   IDogeWalletProvider,
   IFullDogeWalletProvider,
-  IWalletProviderAbilities,
+  TWalletAbility,
 } from "./types";
 
 class FullDogeWalletProvider<T extends IDogeWalletProvider> implements IFullDogeWalletProvider<T> {
@@ -49,7 +49,7 @@ class FullDogeWalletProvider<T extends IDogeWalletProvider> implements IFullDoge
       throw new Error("addWalletBIP44 not supported for this provider.");
     }
   }
-  getAbilities(): IWalletProviderAbilities {
+  getAbilities(): TWalletAbility[] {
     return this.base.getAbilities();
   }
   getBaseProvider(): T {

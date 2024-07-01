@@ -15,17 +15,13 @@ interface IDogeSignatureRequest {
 interface IDogeTransactionSigner {
   getCompressedPublicKey(): Promise<string>;
   canSignHash(): boolean;
-  signHash(hashHex: string): Promise<ISignatureResult>;
+  signHash(hashHex: string, signSha256?: boolean): Promise<ISignatureResult>;
   signTransaction(signatureRequest: IDogeSignatureRequest): Promise<ISignatureResult>;
   getPrivateKeyWIF?(): Promise<string>;
 }
 
-interface IWalletProviderAbilities {
-  addWalletRandom?: boolean;
-  addWalletBIP39?: boolean;
-  addWalletBIP44?: boolean;
-  addWalletBIP178?: boolean;
-}
+
+type TWalletAbility = "add-wallet-random" | "add-wallet-bip39" | "add-wallet-bip44" | "add-wallet-bip178" | "sign-transaction" | "sign-hash-sha256" | "sign-hash-raw" | "export-private-key-wif";
 
 interface IDogeWalletProvider {
   getSigners(): Promise<IDogeTransactionSigner[]>;
@@ -33,7 +29,7 @@ interface IDogeWalletProvider {
   addWalletBIP39?(networkId: DogeNetworkId, seedPhrase: string, password?: string): Promise<IDogeTransactionSigner>;
   addWalletBIP44?(networkId: DogeNetworkId, fullDerivationPath: string): Promise<IDogeTransactionSigner>;
   addWalletBIP178?(networkId: DogeNetworkId, wif: string): Promise<IDogeTransactionSigner>;
-  getAbilities(): IWalletProviderAbilities;
+  getAbilities(): TWalletAbility[];
 }
 
 interface IFullDogeWalletProvider<T extends IDogeWalletProvider> extends IDogeWalletProvider {
@@ -57,5 +53,5 @@ export type {
   IDogeWalletSerialized,
   IFullDogeWalletProvider,
   IDogeSignatureRequest,
-  IWalletProviderAbilities,
+  TWalletAbility,
 }

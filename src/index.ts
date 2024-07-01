@@ -57,7 +57,7 @@ export type {
   IDogeWalletSerialized,
   IFullDogeWalletProvider,
   IDogeSignatureRequest,
-  IWalletProviderAbilities,
+  TWalletAbility,
 } from './wallet/types';
 export * from './wallet';
 

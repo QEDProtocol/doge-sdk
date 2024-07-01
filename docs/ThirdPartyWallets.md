@@ -1,24 +1,31 @@
 # Third Party / Hardware Wallet Support
 
-Implementing hardware wallet support for doge-sdk is easy, just implement the interface:
+Implementing hardware wallet support for doge-sdk is easy, just implement the interface IDogeWalletProvider:
 
 ```typescript
 
 
+interface ISignatureResult {
+  publicKey: string;
+  signature: string;
+}
+
+interface IDogeSignatureRequest {
+  transaction: Transaction;
+  sigHashType: number;
+  inputIndex: number;
+}
+
 interface IDogeTransactionSigner {
   getCompressedPublicKey(): Promise<string>;
   canSignHash(): boolean;
-  signHash(hashHex: string): Promise<ISignatureResult>;
+  signHash(hashHex: string, signSha256?: boolean): Promise<ISignatureResult>;
   signTransaction(signatureRequest: IDogeSignatureRequest): Promise<ISignatureResult>;
   getPrivateKeyWIF?(): Promise<string>;
 }
 
-interface IWalletProviderAbilities {
-  addWalletRandom?: boolean;
-  addWalletFromWIF?: boolean;
-  addWalletFromSeed?: boolean;
-  addWalletFromMnemonic?: boolean;
-}
+
+type TWalletAbility = "add-wallet-random" | "add-wallet-bip39" | "add-wallet-bip44" | "add-wallet-bip178" | "sign-transaction" | "sign-hash-sha256" | "sign-hash-raw" | "export-private-key-wif";
 
 interface IDogeWalletProvider {
   getSigners(): Promise<IDogeTransactionSigner[]>;
@@ -26,8 +33,9 @@ interface IDogeWalletProvider {
   addWalletBIP39?(networkId: DogeNetworkId, seedPhrase: string, password?: string): Promise<IDogeTransactionSigner>;
   addWalletBIP44?(networkId: DogeNetworkId, fullDerivationPath: string): Promise<IDogeTransactionSigner>;
   addWalletBIP178?(networkId: DogeNetworkId, wif: string): Promise<IDogeTransactionSigner>;
-  getAbilities(): IWalletProviderAbilities;
+  getAbilities(): TWalletAbility[];
 }
+
 
 ```
 
@@ -39,6 +47,7 @@ import {
   IDogeLinkRPC,
   IDogeTransactionSigner,
   IDogeWalletProvider,
+  TWalletAbility,
   ISignatureResult,
   Transaction,
   compressPublicKey,
@@ -221,8 +230,8 @@ class LedgerHardwareWalletProvider implements IDogeWalletProvider {
   getSigners(): Promise<IDogeTransactionSigner[]> {
     return Promise.resolve(this.signers);
   }
-  getAbilities(): IWalletProviderAbilities {
-    return {};
+  getAbilities(): TWalletAbility[] {
+    return ["sign-transaction"];
   }
 }
 export { LedgerHardwareWalletProvider, LedgerHardwareWalletSigner };

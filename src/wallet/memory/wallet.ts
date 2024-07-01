@@ -27,6 +27,9 @@ class DogeMemoryWallet implements IDogeTransactionSigner{
     this.wif = encodePrivateKeyToWIF(privateKey, networkId);
     this.name = name;
   }
+  getPrivateKeyWIF(): Promise<string> {
+    return Promise.resolve(this.wif);
+  }
   getCompressedPublicKey(): Promise<string> {
     return Promise.resolve(this.compressedPublicKeyHex);
   }

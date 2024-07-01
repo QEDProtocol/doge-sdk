@@ -15,7 +15,7 @@ import {
 } from './electrsTypes'
 import { DogeLinkElectrsRPC } from './linkElectrs'
 import { DogeLinkRPC } from './linkRPC'
-import { IDogeLinkRPC, IDogeLinkRPCInfo, IUTXO } from './types'
+import { IDogeLinkRPC, IDogeLinkRPCInfo, IFeeEstimateMap, IUTXO } from './types'
 
 class DogeLinkElectrsComboRPC implements IDogeLinkElectrsRPC {
   rpc: IDogeLinkRPC
@@ -33,6 +33,12 @@ class DogeLinkElectrsComboRPC implements IDogeLinkElectrsRPC {
       httpClient
     )
     this.electrsRPC = electrsRPC
+  }
+  getFeeEstimateMap(): Promise<IFeeEstimateMap> {
+    return this.electrsRPC.getFeeEstimateMap();
+  }
+  estimateSmartFee(target: number): Promise<number> {
+    return this.rpc.estimateSmartFee(target);
   }
   getBlockStatus(hash: string): Promise<IBlockStatus> {
     return this.electrsRPC.getBlockStatus(hash)

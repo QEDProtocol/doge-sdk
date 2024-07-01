@@ -16,7 +16,7 @@ import {
   IScriptHashStatsResponse,
   ITransactionOutSpend,
 } from './electrsTypes'
-import { IUTXO } from './types'
+import { IFeeEstimateMap, IUTXO } from './types'
 
 function trimTrailingSlash(s: string) {
   if (s.charAt(s.length - 1) === '/') {
@@ -75,6 +75,28 @@ class DogeLinkElectrsRPC implements IDogeLinkElectrsRPC {
     this.networkId = networkId
     this.httpClient = httpClient || new FetchHTTPClient()
     this.electrsURL = trimTrailingSlash(electrsURL)
+  }
+  getFeeEstimateMap(): Promise<IFeeEstimateMap> {
+    return this.getJSONElectrs<IFeeEstimateMap>('/fee-estimates');
+  }
+  async estimateSmartFee(target: number): Promise<number> {
+    if(target < 1 || target !== Math.floor(target)){
+      throw new Error("Invalid target blocks for estimateSmartFee: " + target);
+    }
+    const feeEstimates = await this.getFeeEstimateMap();
+    if(target<25){
+      const value = (feeEstimates as any)[target];
+      if(typeof value === "number"){
+        return value;
+      }else{
+        throw new Error("Error getting fees for target: " + target);
+      }
+    }else{
+      if(typeof feeEstimates["25"] !== "number"){
+        throw new Error("Error getting fees for target: " + target);
+      }
+      return feeEstimates["25"];
+    }
   }
   getNetwork(): IDogeNetwork {
     return getDogeNetworkById(this.networkId)

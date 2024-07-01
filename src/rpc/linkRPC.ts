@@ -6,11 +6,12 @@ import { Transaction } from "../transaction";
 import { hexToU8Array } from "../utils/data";
 import { seq } from "../utils/misc";
 import { parseDogeLinkNetworkURI } from "./parseNetwork";
-import { IDogeLinkRPC, IDogeLinkRPCInfo } from "./types";
+import { IDogeLinkRPC, IDogeLinkRPCInfo, IFeeEstimateMap } from "./types";
 
 class DogeLinkRPC implements IDogeLinkRPC {
   rpcInfo: IDogeLinkRPCInfo;
   httpClient: IDogeHTTPClient;
+  defaultFeeRate: number = 4590.1337;
 
   constructor(
     rpcInfo: IDogeLinkRPCInfo | string,
@@ -22,6 +23,22 @@ class DogeLinkRPC implements IDogeLinkRPC {
       this.rpcInfo = rpcInfo;
     }
     this.httpClient = httpClient || (new FetchHTTPClient());
+  }
+  async getFeeEstimateMap(): Promise<IFeeEstimateMap> {
+    const feeEstimates = await Promise.all(seq(25).map(x=>this.estimateSmartFee(x+1)));
+    const feeMap: any = {};
+    feeEstimates.forEach((x,i)=>{
+      feeMap[i+1] = x;
+    });
+    return feeMap;
+  }
+  async estimateSmartFee(target: number): Promise<number> {
+    const feeResp = await this.command<{feerate: number, blocks: number}>("estimatesmartfee", [target]);
+    if(feeResp.feerate <= 0){
+      return this.defaultFeeRate;
+    }else{
+      return feeResp.feerate;
+    }
   }
   getNetwork() {
     return getDogeNetworkById(this.rpcInfo.network);

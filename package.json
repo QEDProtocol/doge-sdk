@@ -1,6 +1,6 @@
 {
   "name": "doge-sdk",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "An ultra-lightweight, fully featured dogecoin library for the browser and node.js.",
   "types": "dist/types/index.d.js",
   "exports": {

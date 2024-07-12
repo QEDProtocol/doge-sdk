@@ -314,7 +314,7 @@ class DogeLinkElectrsRPC implements IDogeLinkElectrsRPC {
     txid: string,
     rawHex?: boolean
   ): Promise<IGetTXResponse | string> {
-    if (rawHex) {
+    if (!rawHex) {
       return this.getJSONElectrs<IGetTXResponse>(
         `/tx/${encodeURIComponent(txid)}`
       )

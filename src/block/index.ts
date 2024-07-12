@@ -1,7 +1,18 @@
 import { Transaction } from "../transaction";
 import { BytesReader } from "../utils/bytesReader";
 import { u8ArrayToHex } from "../utils/data";
-
+interface IStandardBlockHeader {
+  version: number;
+  prevHash: string;
+  merkleRoot: string;
+  timestamp: number;
+  bits: number;
+  nonce: number;
+}
+/*
+function hashBlockHeader(blockHeader: IStandardBlockHeader): string {
+  return 
+}*/
 class Block {
 
   version: number = 1;

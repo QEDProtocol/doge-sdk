@@ -1,7 +1,7 @@
 /*
 Varuint encoding and decoding for Bitcoin, ported from varuint-bitcoin to use DateView instead of Buffer.
 
-varuint-bitcoin code: 
+varuint-bitcoin code:
 https://github.com/bitcoinjs/varuint-bitcoin/blob/8342fe7362f20a412d61b9ade20839aafaa7f78e/index.js
 
 varuint-bitcoin license:
@@ -54,17 +54,17 @@ function encodeVaruint(n: number, buffer?: Uint8Array, offset = 0): Uint8Array {
     view.setUint8(offset, n);
   } else if (n <= 0xffff) {
     // 16 bit
-    view.setUint8(0xfd, offset);
-    view.setUint16(n, offset + 1, true);
+    view.setUint8(offset, 0xfd);
+    view.setUint16(offset + 1, n, true);
   } else if (n <= 0xffffffff) {
     // 32 bit
-    view.setUint8(0xfe, offset);
-    view.setUint32(n, offset + 1, true);
+    view.setUint8(offset, 0xfe);
+    view.setUint32(offset + 1, n, true);
   } else {
     // 64 bit
-    view.setUint8(0xff, offset);
-    view.setUint32(n >>> 0, offset + 1, true);
-    view.setUint32((n / 0x100000000) | 0, offset + 5, true);
+    view.setUint8(offset, 0xff);
+    view.setUint32(offset + 1, n >>> 0, true);
+    view.setUint32(offset + 5, (n / 0x100000000) | 0, true);
   }
   return destBuffer;
 }
@@ -108,9 +108,27 @@ function varuintEncodingLength(n: number) {
   return n < 0xfd ? 1 : n <= 0xffff ? 3 : n <= 0xffffffff ? 5 : 9;
 }
 
+function varSliceEncodingLength(someScript: Uint8Array): number {
+  const length = someScript.length;
+
+  return varuintEncodingLength(length) + length;
+}
+
+function vectorEncodingLength(someVector: Uint8Array[]): number {
+  const length = someVector.length;
+
+  return (
+    varuintEncodingLength(length) +
+    someVector.reduce((sum, witness) => {
+      return sum + varSliceEncodingLength(witness);
+    }, 0)
+  );
+}
 
 export {
   varuintEncodingLength,
+  varSliceEncodingLength,
+  vectorEncodingLength,
   encodeVaruint,
   decodeVaruint,
 }

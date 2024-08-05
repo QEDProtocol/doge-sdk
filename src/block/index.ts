@@ -1,86 +1,107 @@
-import { Transaction } from "../transaction";
-import { BytesReader } from "../utils/bytesReader";
-import { u8ArrayToHex } from "../utils/data";
-interface IStandardBlockHeader {
-  version: number;
-  prevHash: string;
-  merkleRoot: string;
-  timestamp: number;
-  bits: number;
-  nonce: number;
-}
-/*
-function hashBlockHeader(blockHeader: IStandardBlockHeader): string {
-  return 
-}*/
-class Block {
+import { hashBuffer } from '../hash';
+import { Transaction } from '../transaction';
+import { BytesBuilder } from '../utils/bytesBuilder';
+import { BytesReader } from '../utils/bytesReader';
+import { hexToU8Array, u8ArrayToHex, u8ArrayToHexReversed } from '../utils/data';
+import { varuintEncodingLength } from '../utils/varuint';
+import { AuxPow } from './auxpow';
+import { BlockHeader } from './header';
+import type { IMerkleBranch, IStandardBlockHeader, IStandardBlockHeaderAuxPow } from './types';
+import { writeStandardBlockHeader } from './utils';
 
+class Block implements IStandardBlockHeaderAuxPow {
   version: number = 1;
-  prevHash: string = "";
-  merkleRoot: string = "";
+  prevHash: string = '';
+  merkleRoot: string = '';
   timestamp: number = 0;
   bits: number = 0;
   nonce: number = 0;
+  auxData?: AuxPow;
+
   transactions: Transaction[] = [];
-/*
-    if (buffer.length < 80) throw new Error('Buffer too small (< 80 bytes)');
 
-    const bufferReader = new BufferReader(buffer);
+  getBlockHeader(): BlockHeader {
+    return new BlockHeader(this);
+  }
 
-    const block = new Block();
-    block.version = bufferReader.readInt32();
-    block.prevHash = bufferReader.readSlice(32);
-    block.merkleRoot = bufferReader.readSlice(32);
-    block.timestamp = bufferReader.readUInt32();
-    block.bits = bufferReader.readUInt32();
-    block.nonce = bufferReader.readUInt32();
+  getBlockHash(): string {
+    const builder = new BytesBuilder(80);
+    writeStandardBlockHeader(builder, this);
+    return u8ArrayToHexReversed(hashBuffer("hash256", builder.toBuffer()));
+  }
 
-    if (buffer.length === 80) return block;
+  byteLength(): number {
+    const headerLength = this.auxData ? (80 + this.auxData.byteLength()) : 80;
+    const transactionsLength = this.transactions.reduce((acc, tx) => acc + tx.byteLength(false), 0) + varuintEncodingLength(this.transactions.length);
+    return headerLength + transactionsLength;
+  }
 
-    const readTransaction = (): any => {
-      const tx = Transaction.fromBuffer(
-        bufferReader.buffer.slice(bufferReader.offset),
-        true,
-      );
-      bufferReader.offset += tx.byteLength();
-      return tx;
-    };
+  writeToBytesBuilder(builder: BytesBuilder): BytesBuilder {
+    this.getBlockHeader().writeToBytesBuilder(builder);
 
-    const nTransactions = bufferReader.readVarInt();
-    block.transactions = [];
+    builder.writeVaruint(this.transactions.length);
 
-    for (let i = 0; i < nTransactions; ++i) {
-      const tx = readTransaction();
-      block.transactions.push(tx);
-    }
+    // dogecoin transaction do not have witness data, so allowWitness is false
+    this.transactions.forEach((tx) => tx.writeToBytesBuilder(builder, false, null));
 
-    const witnessCommit = block.getWitnessCommit();
-    // This Block contains a witness commit
-    if (witnessCommit) block.witnessCommit = witnessCommit;
-    */
-  static fromBuffer(buffer: Uint8Array): Block {
-    if(buffer.length < 80) {
-      throw new Error('Block must be at least 80 bytes long');
-    }
-    const block = new Block();
-    const reader = new BytesReader(buffer);
-    block.version = reader.readInt32();
-    block.prevHash = u8ArrayToHex(reader.readBytes(32));
-    block.merkleRoot = u8ArrayToHex(reader.readBytes(32));
-    block.timestamp = reader.readUint32();
-    block.bits = reader.readUint32();
-    block.nonce = reader.readUint32();
+    return builder;
+  }
+
+  toBuffer(): Uint8Array {
+    return this.writeToBytesBuilder(
+      new BytesBuilder(this.byteLength())
+    ).toBuffer();
+  }
+  toHex(): string {
+    return u8ArrayToHex(this.toBuffer());
+  }
+
+  static fromBytesReader(reader: BytesReader): Block {
+    const header = BlockHeader.fromBytesReader(reader);
+
     const nTransactions = reader.readVaruint();
-    block.transactions = [];
-    for(let i=0;i<nTransactions;i++){
-      block.transactions.push(Transaction.fromBytesReader(reader));
+
+    const transactions = [];
+    for (let i = 0; i < nTransactions; i++) {
+      transactions.push(Transaction.fromBytesReader(reader));
     }
+
+    const block = new Block();
+
+    block.version = header.version;
+    block.prevHash = header.prevHash;
+    block.merkleRoot = header.merkleRoot;
+    block.timestamp = header.timestamp;
+    block.bits = header.bits;
+    block.nonce = header.nonce;
+    block.auxData = header.auxData;
+
+    block.transactions = transactions;
 
     return block;
   }
-}
 
+  static fromBuffer(buffer: Uint8Array): Block {
+    if (buffer.length < 80) {
+      throw new Error('Block must be at least 80 bytes long');
+    }
+    return Block.fromBytesReader(new BytesReader(buffer));
+  }
+
+  static fromHex(hex: string): Block {
+    return Block.fromBuffer(hexToU8Array(hex));
+  }
+
+}
 
 export {
   Block,
-}
+  BlockHeader,
+  AuxPow
+};
+
+export type {
+  IStandardBlockHeader,
+  IMerkleBranch,
+  IStandardBlockHeaderAuxPow,
+};

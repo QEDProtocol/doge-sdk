@@ -11,7 +11,7 @@ import { IDogeLinkRPC, IDogeLinkRPCInfo, IFeeEstimateMap } from "./types";
 class DogeLinkRPC implements IDogeLinkRPC {
   rpcInfo: IDogeLinkRPCInfo;
   httpClient: IDogeHTTPClient;
-  defaultFeeRate: number = 4590.1337;
+  defaultFeeRate: number = 4590;
 
   constructor(
     rpcInfo: IDogeLinkRPCInfo | string,

@@ -1,4 +1,4 @@
-import { encodeVaruint } from "./varuint";
+import { encodeVaruint } from './varuint';
 
 class BytesBuilder {
   bufferSize: number;
@@ -17,7 +17,7 @@ class BytesBuilder {
         this.buffer = this.buffer.slice(0, this.offset);
       }
       this.previousBuffers.push(this.buffer);
-      const newSize = Math.max(size+512, 1024);
+      const newSize = Math.max(size + 512, 1024);
       this.buffer = new Uint8Array(newSize);
       this.bufferSize = newSize;
       this.view = new DataView(this.buffer.buffer);
@@ -36,6 +36,12 @@ class BytesBuilder {
     this.offset += 2;
     return this;
   }
+  writeInt32(value: number, littleEndian = true): this {
+    this.reserve(4);
+    this.view.setInt32(this.offset, value, littleEndian);
+    this.offset += 4;
+    return this;
+  }
   writeUint32(value: number, littleEndian = true): this {
     this.reserve(4);
     this.view.setUint32(this.offset, value, littleEndian);
@@ -50,10 +56,10 @@ class BytesBuilder {
   }
   writeBytes(bytes: Uint8Array | number[]): this {
     this.reserve(bytes.length);
-    if(bytes instanceof Uint8Array){
+    if (bytes instanceof Uint8Array) {
       this.buffer.set(bytes, this.offset);
       this.offset += bytes.length;
-    }else{
+    } else {
       for (const byte of bytes) {
         this.buffer[this.offset++] = byte;
       }
@@ -68,6 +74,13 @@ class BytesBuilder {
     this.writeVaruint(slice.length);
     return this.writeBytes(slice);
   }
+  writeVector(vector: Uint8Array[]): this {
+    this.writeVaruint(vector.length);
+    for (const v of vector) {
+      this.writeVarSlice(v);
+    }
+    return this;
+  }
   toBuffer(): Uint8Array {
     if (this.previousBuffers.length === 0) {
       if (this.buffer.length === this.offset) {
@@ -76,7 +89,9 @@ class BytesBuilder {
         return this.buffer.slice(0, this.offset);
       }
     } else {
-      const totalLength = this.previousBuffers.reduce((acc, buffer) => acc + buffer.length, 0) + this.offset;
+      const totalLength =
+        this.previousBuffers.reduce((acc, buffer) => acc + buffer.length, 0) +
+        this.offset;
       const result = new Uint8Array(totalLength);
       let offset = 0;
       for (const buffer of this.previousBuffers) {
@@ -89,6 +104,4 @@ class BytesBuilder {
   }
 }
 
-export {
-  BytesBuilder,
-}
+export { BytesBuilder };

@@ -113,3 +113,5 @@ export type {
   ICreateP2SHParams,
 } from './helpers/p2sh/types';
 export * from './helpers/p2sh';
+
+export * from './block';

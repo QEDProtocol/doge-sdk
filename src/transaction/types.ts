@@ -7,6 +7,7 @@ interface ITransactionInputWithoutScript {
 }
 interface ITransactionInput extends ITransactionInputWithoutScript {
   script: Uint8Array;
+  witness?: Uint8Array[];
 }
 
 interface ITransactionOutput {

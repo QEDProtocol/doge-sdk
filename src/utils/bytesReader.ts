@@ -73,8 +73,20 @@ class BytesReader {
     const size = this.readVaruint();
     return this.readBytes(size);
   }
+  readVector(): Uint8Array[] {
+    const count = this.readVaruint();
+    const vector: Uint8Array[] = [];
+    for(let i=0;i<count;i++){
+      vector[i] = this.readVarSlice();
+    }
+    return vector;
+  }
   peekByte(): number {
     return this.buffer[this.offset];
+  }
+  peek2Bytes(): [number, number] {
+    this.reserve(2);
+    return [this.buffer[this.offset], this.buffer[this.offset+1]];
   }
   peekUint16(littleEndian = true): number {
     return this.view.getUint16(this.offset, littleEndian);

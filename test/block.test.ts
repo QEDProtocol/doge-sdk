@@ -10,6 +10,10 @@ describe('Block Serialization', () => {
       txHashes.forEach((txHash, i)=>{
         expect(txHash).toEqual(block.block.tx[i]);
       });
+      expect(!!blk.auxData).toBe(!!block.block.auxpow);
+      if(blk.auxData){
+        expect(blk.auxData.coinbaseTransaction.toHex()).toEqual(block.block.auxpow?.tx.hex);
+      }
     });
   });
 });

@@ -1,4 +1,4 @@
-import { verify } from "@noble/secp256k1";
+import { verify } from "@qed-noble/secp256k1";
 import { hexToU8Array, u8ArrayToHex } from "../utils/data";
 
 function normalizeSignatureFromDer(signatureHexDer: string) {

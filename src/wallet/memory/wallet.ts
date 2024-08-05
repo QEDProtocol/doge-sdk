@@ -1,4 +1,4 @@
-import { getPublicKey, sign, signAsync } from "@noble/secp256k1";
+import { getPublicKey, sign, signAsync } from "@qed-noble/secp256k1";
 import { DogeNetworkId, IDogeNetwork } from "../../networks/types";
 import { hexToU8Array, u8ArrayToHex } from "../../utils/data";
 import { getDogeNetworkById } from "../../networks";

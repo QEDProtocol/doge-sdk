@@ -6,10 +6,10 @@ module.exports = {
     },
   },
   transform: {
-    "/node_modules/@noble/(secp256k1)?/(.+).js": "ts-jest",
+    "/node_modules/@qed-noble/(secp256k1)?/(.+).js": "ts-jest",
   },
   transformIgnorePatterns: [
-    "<rootDir>/node_modules/(?!@noble)/",
+    "<rootDir>/node_modules/(?!@qed-noble)/",
   ],
   preset: "ts-jest",
   roots: ['<rootDir>/test'],

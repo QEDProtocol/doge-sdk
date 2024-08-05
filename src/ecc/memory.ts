@@ -1,4 +1,4 @@
-import { getPublicKey, signAsync } from '@noble/secp256k1';
+import { getPublicKey, signAsync } from '@qed-noble/secp256k1';
 import { u8ArrayToHex } from '../utils/data';
 import { IHashSigner, ISimpleSecp256K1Provider } from './types';
 import { bigIntU256ToBytesBE, derEncodeSignature } from './encoding';

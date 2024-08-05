@@ -27,7 +27,7 @@ An ultra lightweight (20kb gzipped) doge library for Node.js and the Browser wit
 * Support for both P2PKH and P2SH transactions
 * Built in Memory Wallet + Support for Hardware Wallets (ledger, trezor, etc.)
 * Does not depend on bitcoinjs-lib (no need for a megabyte of nodejs polyfills and global scope pollution)
-* Only has pinned one dependency, [@noble/secp256k1](https://github.com/paulmillr/noble-secp256k1) which is only 4kb, and has already been [audited](https://cure53.de/pentest-report_noble-lib.pdf).
+* Only has pinned one dependency, [@qed-noble/secp256k1](https://github.com/QEDProtocol/noble-secp256k1) which is only 4kb, and has already been [audited](https://cure53.de/pentest-report_noble-lib.pdf).
 * Compiler/Assembler for BASM and standard bitcoin assembly
 
 

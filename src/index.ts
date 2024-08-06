@@ -80,6 +80,7 @@ export type {
   IDogeLinkRPCInfo,
   IDogeLinkRPC,
   ITransactionWithStatus,
+  IFeeEstimateMap,
 } from './rpc/types';
 export * from './rpc';
 

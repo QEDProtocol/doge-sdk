@@ -6,7 +6,8 @@ import { Transaction } from "../transaction";
 import { hexToU8Array } from "../utils/data";
 import { seq } from "../utils/misc";
 import { parseDogeLinkNetworkURI } from "./parseNetwork";
-import { IDogeLinkRPC, IDogeLinkRPCInfo, IFeeEstimateMap } from "./types";
+import { IDogeRPCGetRawTxResponse } from "./rpcTypes";
+import { IDogeLinkRPC, IDogeLinkRPCInfo, IFeeEstimateMap, ITransactionWithStatus } from "./types";
 
 class DogeLinkRPC implements IDogeLinkRPC {
   rpcInfo: IDogeLinkRPCInfo;
@@ -24,6 +25,61 @@ class DogeLinkRPC implements IDogeLinkRPC {
     }
     this.httpClient = httpClient || (new FetchHTTPClient());
   }
+  async getTransactionWithStatus(txid: string): Promise<ITransactionWithStatus> {
+    const response = await this.command<IDogeRPCGetRawTxResponse>("getrawtransaction", [txid, 1]);
+    const tx = Transaction.fromHex(response.hex);
+    if(response.confirmations && response.blockhash && response.blocktime){
+      const header = await this.command("getblockheader", [response.blockhash, true]);
+      return {
+        transaction: tx,
+        status: {
+          confirmed: true,
+          block_height: header.height,
+          block_hash: response.blockhash,
+          block_time: response.blocktime,
+          confirmations: header.confirmations,
+        }
+      }
+    }else{
+      return {
+        transaction: tx,
+        status: {
+          confirmed: false,
+        }
+      }
+    }
+  }
+  async waitForTransaction(txid: string, waitUntilConfirmed: boolean = false, pollInterval: number = 1000, maxAttempts: number = 9999): Promise<ITransactionWithStatus> {
+    for(let i=0;i<maxAttempts;i++){
+      try {
+        const response = await this.command<IDogeRPCGetRawTxResponse>("getrawtransaction", [txid, 1]);
+        if(response.confirmations && response.blockhash && response.blocktime){
+          const header = await this.command("getblockheader", [response.blockhash, true]);
+          return {
+            transaction: Transaction.fromHex(response.hex),
+            status: {
+              confirmed: true,
+              block_height: header.height,
+              block_hash: response.blockhash,
+              block_time: response.blocktime,
+              confirmations: header.confirmations,
+            }
+          }
+        }else if(!waitUntilConfirmed){
+          return {
+            transaction: Transaction.fromHex(response.hex),
+            status: {
+              confirmed: false,
+            }
+          }
+        }
+      }catch(e){
+      }
+      await new Promise((resolve)=>setTimeout(resolve, pollInterval));
+    }
+
+    throw new Error("Transaction not found after "+maxAttempts+" attempts");  }
+
   async getFeeEstimateMap(): Promise<IFeeEstimateMap> {
     const feeEstimates = await Promise.all(seq(25).map(x=>this.estimateSmartFee(x+1)));
     const feeMap: any = {};
@@ -84,11 +140,11 @@ class DogeLinkRPC implements IDogeLinkRPC {
   getBlockCount(): Promise<number> {
     return this.command<number>("getblockcount", []);
   }
-  getRawTransaction(txId: string): Promise<string> {
-    return this.command<string>("getrawtransaction", [txId]);
+  getRawTransaction(txid: string): Promise<string> {
+    return this.command<string>("getrawtransaction", [txid]);
   }
-  async getTransaction(txId: string): Promise<Transaction> {
-    const txHex = await this.getRawTransaction(txId);
+  async getTransaction(txid: string): Promise<Transaction> {
+    const txHex = await this.getRawTransaction(txid);
     return Transaction.fromHex(txHex);
   }
   getBlockHash(height: number): Promise<string> {

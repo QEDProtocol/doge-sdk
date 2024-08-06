@@ -14,7 +14,7 @@
 
   <h2 align="center">doge-sdk</h2>
   <p align="center">
-An ultra lightweight (20kb gzipped) doge library for Node.js and the Browser with only 1 dependency.
+An ultra lightweight (24kb gzipped) doge library for Node.js and the Browser with only 1 dependency.
   </p>
   <p align="center">
     Made with ❤️ by <a href="https://qedprotocol.com">QED</a>
@@ -23,7 +23,7 @@ An ultra lightweight (20kb gzipped) doge library for Node.js and the Browser wit
 
 ## Features
 * Works out of the box in Node and the Browser without any polyfills
-* only 20kb gzipped ✨
+* only 24kb gzipped ✨
 * Support for both P2PKH and P2SH transactions
 * Built in Memory Wallet + Support for Hardware Wallets (ledger, trezor, etc.)
 * Does not depend on bitcoinjs-lib (no need for a megabyte of nodejs polyfills and global scope pollution)

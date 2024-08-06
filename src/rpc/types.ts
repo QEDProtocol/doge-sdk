@@ -1,11 +1,19 @@
 import { Block } from "../block";
 import { DogeNetworkId, IDogeNetwork } from "../networks/types";
 import { Transaction } from "../transaction";
+import { ITXConfirmedStatus } from "./electrsTypes";
+
+interface ITransactionWithStatus {
+  transaction: Transaction;
+  status: ITXConfirmedStatus;
+}
+
 interface IDogeLinkRPC {
   getNetwork(): IDogeNetwork;
   getBlockCount(): Promise<number>;
-  getRawTransaction(txId: string): Promise<string>;
-  getTransaction(txId: string): Promise<Transaction>;
+  getRawTransaction(txid: string): Promise<string>;
+  getTransaction(txid: string): Promise<Transaction>;
+  getTransactionWithStatus(txid: string): Promise<ITransactionWithStatus>;
   getBlockHash(height: number): Promise<string>;
   mineBlocks(count: number, address?: string): Promise<string[]>;
   isDoge(): boolean;
@@ -16,6 +24,7 @@ interface IDogeLinkRPC {
   resolveBlockNumber(blockHashOrNumber: string | number): Promise<number>;
   getFeeEstimateMap(): Promise<IFeeEstimateMap>;
   estimateSmartFee(target: number): Promise<number>;
+  waitForTransaction(txid: string, waitUntilConfirmed?: boolean, pollInterval?: number, maxAttempts?: number): Promise<ITransactionWithStatus>;
 }
 interface IFeeEstimateMap {
   "1": number;
@@ -78,4 +87,5 @@ export type {
   IDogeLinkRPCInfo,
   IDogeLinkRPC,
   IFeeEstimateMap,
+  ITransactionWithStatus,
 }

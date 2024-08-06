@@ -21,12 +21,14 @@ interface ITxConfirmedStatusFalse {
   block_height?: number;
   block_hash?: string;
   block_time?: number;
+  confirmations?: number;
 }
 interface ITxConfirmedStatusTrue {
   confirmed: true;
   block_height: number;
   block_hash: string;
   block_time: number;
+  confirmations?: number;
 }
 type ITXConfirmedStatus = ITxConfirmedStatusFalse | ITxConfirmedStatusTrue;
 
@@ -97,7 +99,7 @@ interface ITransactionOutSpendBase {
   txid?: string;
   vin?: number;
   status?: ITXConfirmedStatus;
-  
+
 }
 interface ITransactionOutSpendSpent extends ITransactionOutSpendBase {
   spent: true;
@@ -118,10 +120,10 @@ interface IDogeLinkElectrsRPC extends IDogeLinkRPC {
   getTransactionsFor(addressOrScriptHash: string, confirmed?: boolean, afterTxid?: string): Promise<IGetTXResponse[]>;
   getStatsFor(addressOrScriptHash: string): Promise<IAddressStatsResponse | IScriptHashStatsResponse>;
   getBlockHeight(): Promise<number>;
-  getTransactionElectrs(txId: string): Promise<IGetTXResponse>;
-  getTransactionElectrs(txId: string, rawHex: true): Promise<string>;
-  getTransactionElectrs(txId: string, rawHex: false): Promise<IGetTXResponse>;
-  getTransactionElectrs(txId: string, rawHex: undefined): Promise<IGetTXResponse>;
+  getTransactionElectrs(txid: string): Promise<IGetTXResponse>;
+  getTransactionElectrs(txid: string, rawHex: true): Promise<string>;
+  getTransactionElectrs(txid: string, rawHex: false): Promise<IGetTXResponse>;
+  getTransactionElectrs(txid: string, rawHex: undefined): Promise<IGetTXResponse>;
   getUTXOs(addressOrScriptHash: string): Promise<IUTXO[]>;
   waitUntilUTXO(address: string, pollInterval?: number, maxAttempts?: number): Promise<IUTXO[]>;
   getMempoolStatus(): Promise<IMempoolStatus>;

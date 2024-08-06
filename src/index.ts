@@ -1,5 +1,8 @@
 export * from './address';
 export * from './ecc';
+export * from './coinselect';
+export * from './singlet';
+
 export type {
   IHashSigner,
   ISimpleSecp256K1Provider,
@@ -23,12 +26,13 @@ export type {
 export * from './transaction';
 
 export type {
-  THash256,
   ITransactionInputWithoutScript,
   ITransactionInput,
   ITransactionOutput,
   ITransaction,
   ISigHashPreimage,
+  ITransactionOutputUser,
+  ITransactionOutputAddress,
 } from './transaction/types';
 export * from './transaction/constants';
 
@@ -75,6 +79,7 @@ export type {
   IBaseUTXO,
   IDogeLinkRPCInfo,
   IDogeLinkRPC,
+  ITransactionWithStatus,
 } from './rpc/types';
 export * from './rpc';
 
@@ -113,5 +118,6 @@ export type {
   ICreateP2SHParams,
 } from './helpers/p2sh/types';
 export * from './helpers/p2sh';
+export * from './helpers/transfer';
 
 export * from './block';

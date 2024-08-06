@@ -1,7 +1,7 @@
-import { Block } from '../block'
-import { IDogeHTTPClient } from '../http/types'
-import { IDogeNetwork } from '../networks/types'
-import { Transaction } from '../transaction'
+import { Block } from '../block';
+import { IDogeHTTPClient } from '../http/types';
+import { IDogeNetwork } from '../networks/types';
+import { Transaction } from '../transaction';
 import {
   IAddressStatsResponse,
   IBasicBlock,
@@ -12,27 +12,44 @@ import {
   IMempoolStatus,
   IScriptHashStatsResponse,
   ITransactionOutSpend,
-} from './electrsTypes'
-import { DogeLinkElectrsRPC } from './linkElectrs'
-import { DogeLinkRPC } from './linkRPC'
-import { IDogeLinkRPC, IDogeLinkRPCInfo, IFeeEstimateMap, IUTXO } from './types'
+} from './electrsTypes';
+import { DogeLinkElectrsRPC } from './linkElectrs';
+import { DogeLinkRPC } from './linkRPC';
+import {
+  IDogeLinkRPC,
+  IDogeLinkRPCInfo,
+  IFeeEstimateMap,
+  ITransactionWithStatus,
+  IUTXO,
+} from './types';
 
 class DogeLinkElectrsComboRPC implements IDogeLinkElectrsRPC {
-  rpc: IDogeLinkRPC
-  electrsRPC: IDogeLinkElectrsRPC
+  rpc: IDogeLinkRPC;
+  electrsRPC: IDogeLinkElectrsRPC;
   constructor(
     rpcInfo: IDogeLinkRPCInfo | string,
     electrsURL: string,
     httpClient?: IDogeHTTPClient
   ) {
-    const rpc = new DogeLinkRPC(rpcInfo, httpClient)
-    this.rpc = rpc
+    const rpc = new DogeLinkRPC(rpcInfo, httpClient);
+    this.rpc = rpc;
     const electrsRPC = new DogeLinkElectrsRPC(
       electrsURL,
       rpc.getNetwork().networkId,
       httpClient
-    )
-    this.electrsRPC = electrsRPC
+    );
+    this.electrsRPC = electrsRPC;
+  }
+  getTransactionWithStatus(txid: string): Promise<ITransactionWithStatus> {
+    return this.electrsRPC.getTransactionWithStatus(txid);
+  }
+  waitForTransaction(
+    txid: string,
+    waitUntilConfirmed?: boolean,
+    pollInterval?: number,
+    maxAttempts?: number
+  ): Promise<ITransactionWithStatus> {
+    return this.electrsRPC.waitForTransaction(txid);
   }
   getFeeEstimateMap(): Promise<IFeeEstimateMap> {
     return this.electrsRPC.getFeeEstimateMap();
@@ -41,16 +58,16 @@ class DogeLinkElectrsComboRPC implements IDogeLinkElectrsRPC {
     return this.rpc.estimateSmartFee(target);
   }
   getBlockStatus(hash: string): Promise<IBlockStatus> {
-    return this.electrsRPC.getBlockStatus(hash)
+    return this.electrsRPC.getBlockStatus(hash);
   }
   getBlockGroup(start?: number | undefined): Promise<IBasicBlock[]> {
-    return this.electrsRPC.getBlockGroup(start)
+    return this.electrsRPC.getBlockGroup(start);
   }
   getBlockBasic(hash: string): Promise<IBasicBlock> {
-    return this.electrsRPC.getBlockBasic(hash)
+    return this.electrsRPC.getBlockBasic(hash);
   }
   getBalance(address: string): Promise<number> {
-    return this.electrsRPC.getBalance(address)
+    return this.electrsRPC.getBalance(address);
   }
   getTransactionsFor(
     addressOrScriptHash: string,
@@ -61,80 +78,80 @@ class DogeLinkElectrsComboRPC implements IDogeLinkElectrsRPC {
       addressOrScriptHash,
       confirmed,
       afterTxid
-    )
+    );
   }
   getStatsFor(
     addressOrScriptHash: string
   ): Promise<IAddressStatsResponse | IScriptHashStatsResponse> {
-    return this.electrsRPC.getStatsFor(addressOrScriptHash)
+    return this.electrsRPC.getStatsFor(addressOrScriptHash);
   }
   getBlockHeight(): Promise<number> {
-    return this.electrsRPC.getBlockHeight()
+    return this.electrsRPC.getBlockHeight();
   }
-  getTransactionElectrs(txId: string): Promise<IGetTXResponse>
-  getTransactionElectrs(txId: string, rawHex: true): Promise<string>
-  getTransactionElectrs(txId: string, rawHex: false): Promise<IGetTXResponse>
+  getTransactionElectrs(txid: string): Promise<IGetTXResponse>;
+  getTransactionElectrs(txid: string, rawHex: true): Promise<string>;
+  getTransactionElectrs(txid: string, rawHex: false): Promise<IGetTXResponse>;
   getTransactionElectrs(
-    txId: string,
+    txid: string,
     rawHex?: boolean
   ): Promise<string> | Promise<IGetTXResponse> {
-    return this.electrsRPC.getTransactionElectrs(txId as string, rawHex as any)
+    return this.electrsRPC.getTransactionElectrs(txid as string, rawHex as any);
   }
   getUTXOs(addressOrScriptHash: string): Promise<IUTXO[]> {
-    return this.electrsRPC.getUTXOs(addressOrScriptHash)
+    return this.electrsRPC.getUTXOs(addressOrScriptHash);
   }
   waitUntilUTXO(
     address: string,
     pollInterval?: number | undefined,
     maxAttempts?: number | undefined
   ): Promise<IUTXO[]> {
-    return this.electrsRPC.waitUntilUTXO(address, pollInterval, maxAttempts)
+    return this.electrsRPC.waitUntilUTXO(address, pollInterval, maxAttempts);
   }
   getMempoolStatus(): Promise<IMempoolStatus> {
-    return this.electrsRPC.getMempoolStatus()
+    return this.electrsRPC.getMempoolStatus();
   }
   getMempoolRecentTransactions(): Promise<IMempoolRecentTransaction[]> {
-    return this.electrsRPC.getMempoolRecentTransactions()
+    return this.electrsRPC.getMempoolRecentTransactions();
   }
   getTransactionOutSpends(txid: string): Promise<ITransactionOutSpend[]> {
-    return this.electrsRPC.getTransactionOutSpends(txid)
+    return this.electrsRPC.getTransactionOutSpends(txid);
   }
   getNetwork(): IDogeNetwork {
-    return this.rpc.getNetwork()
+    return this.rpc.getNetwork();
   }
   getBlockCount(): Promise<number> {
-    return this.rpc.getBlockCount()
+    return this.rpc.getBlockCount();
   }
-  getRawTransaction(txId: string): Promise<string> {
-    return this.rpc.getRawTransaction(txId)
+  getRawTransaction(txid: string): Promise<string> {
+    return this.rpc.getRawTransaction(txid);
   }
-  getTransaction(txId: string): Promise<Transaction> {
-    return this.rpc.getTransaction(txId)
+  getTransaction(txid: string): Promise<Transaction> {
+    return this.rpc.getTransaction(txid);
   }
   getBlockHash(height: number): Promise<string> {
-    return this.rpc.getBlockHash(height)
+    return this.rpc.getBlockHash(height);
   }
   mineBlocks(count: number, address?: string | undefined): Promise<string[]> {
-    return this.rpc.mineBlocks(count, address)
+    return this.rpc.mineBlocks(count, address);
   }
   isDoge(): boolean {
-    return this.rpc.isDoge()
+    return this.rpc.isDoge();
   }
   sendRawTransaction(txHex: string): Promise<string> {
-    return this.rpc.sendRawTransaction(txHex)
+    return this.rpc.sendRawTransaction(txHex);
   }
   getBlock(blockHashOrNumber: string | number): Promise<Block> {
-    return this.rpc.getBlock(blockHashOrNumber)
+    return this.rpc.getBlock(blockHashOrNumber);
   }
   getBlocks(start: number, count: number): Promise<Block[]> {
-    return this.rpc.getBlocks(start, count)
+    return this.rpc.getBlocks(start, count);
   }
   resolveBlockHash(blockHashOrNumber: string | number): Promise<string> {
-    return this.rpc.resolveBlockHash(blockHashOrNumber)
+    return this.rpc.resolveBlockHash(blockHashOrNumber);
   }
   resolveBlockNumber(blockHashOrNumber: string | number): Promise<number> {
-    return this.rpc.resolveBlockNumber(blockHashOrNumber)
+    return this.rpc.resolveBlockNumber(blockHashOrNumber);
   }
 }
 
-export { DogeLinkElectrsComboRPC }
+export { DogeLinkElectrsComboRPC };

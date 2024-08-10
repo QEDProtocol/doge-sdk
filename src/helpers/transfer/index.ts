@@ -1,4 +1,5 @@
 import { encodeP2PKHAddress } from "../../address";
+import { coinSelectP2PKH } from "../../coinselect";
 import { hashBuffer, hashHex } from "../../hash";
 import { DogeNetworkId } from "../../networks/types";
 import { IDogeLinkElectrsRPC } from "../../rpc/electrsTypes";
@@ -69,7 +70,7 @@ interface ICreateP2PKHSimpleCoinSelectParamsLinkRPC extends ICreateP2PKHSimpleCo
   signer: IDogeTransactionSigner;
 }
 
-type ICreateP2PKHSimpleCoinSelectParams = ICreateP2PKHSimpleCoinSelectParamsResolved | ICreateP2PKHSimpleCoinSelectParamsRPC | ICreateP2PKHSimpleCoinSelectParamsNetworkId;
+type ICreateP2PKHSimpleCoinSelectParams = ICreateP2PKHSimpleCoinSelectParamsLinkRPC | ICreateP2PKHSimpleCoinSelectParamsResolved | ICreateP2PKHSimpleCoinSelectParamsRPC | ICreateP2PKHSimpleCoinSelectParamsNetworkId;
 async function resolveInputs(address: string, params: ICreateP2PKHSimpleCoinSelectParams): Promise<IP2PKHFundingUTXO[]> {
   if(!params.inputs){
     if(!params.rpc || typeof (params.rpc as IDogeLinkElectrsRPC).getUTXOs !== "function") {
@@ -96,12 +97,8 @@ async function resolveInputs(address: string, params: ICreateP2PKHSimpleCoinSele
 async function createP2PKHParamsSimpleCS(params: ICreateP2PKHSimpleCoinSelectParams): Promise<ICreateP2PKHParams> {
   const address = await resolveAddressFromSigner(params);
   const inputs = await resolveInputs(address, params);
-
-  return {
-    address,
-    inputs,
-    outputs: params.outputs,
-  }
+  const result = coinSelectP2PKH(address, params.feeRate, inputs, params.outputs);
+  return result;
 }
 
 async function createP2PKHTxBuilderSimpleCS(params: ICreateP2PKHSimpleCoinSelectParams & {signer: IDogeTransactionSigner}): Promise<TransactionBuilder> {

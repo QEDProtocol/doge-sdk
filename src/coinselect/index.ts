@@ -1,6 +1,6 @@
 import { addressToOutputScript, decodeAddressFull, getP2PKHOutputScript, getP2SHOutputScript, isP2PKHAddress } from "../address";
 import { ICreateP2PKHParams } from "../helpers/p2pkh/types";
-import { IUTXO } from "../rpc/types";
+import { IBaseUTXO } from "../rpc/types";
 import { ITransactionOutputAddress } from "../transaction/types";
 import { varuintEncodingLength } from "../utils/varuint";
 
@@ -40,9 +40,9 @@ interface ITxPlanSettings {
   outputSelfScriptLength: number;
   outputs: {scriptLength: number, amount: number}[];
   feeRate: number;
-  utxos: IUTXO[];
+  utxos: IBaseUTXO[];
 }
-function coinSelectCore(settings: ITxPlanSettings): IUTXO[] {
+function coinSelectCore(settings: ITxPlanSettings): IBaseUTXO[] {
   const { inputScriptLength, outputSelfScriptLength, outputs, feeRate, utxos } = settings;
 
   const targetAmount = outputs.reduce((sum, output) => sum + output.amount, 0);
@@ -50,8 +50,8 @@ function coinSelectCore(settings: ITxPlanSettings): IUTXO[] {
   const maxTries = 100000;
   const maxChangeOutputs = 3;
 
-  function createSolution(): { utxos: IUTXO[], fee: number, change: number[] } | null {
-    let selectedUTXOs: IUTXO[] = [];
+  function createSolution(): { utxos: IBaseUTXO[], fee: number, change: number[] } | null {
+    let selectedUTXOs: IBaseUTXO[] = [];
     let selectedAmount = 0;
     let fee = 0;
     let changeOutputs: number[] = [];
@@ -104,7 +104,7 @@ function coinSelectCore(settings: ITxPlanSettings): IUTXO[] {
     return null; // Not enough funds
   }
 
-  let bestSolution: { utxos: IUTXO[], fee: number, change: number[] } | null = null;
+  let bestSolution: { utxos: IBaseUTXO[], fee: number, change: number[] } | null = null;
 
   // Try to find the best solution
   for (let i = 0; i < maxTries; i++) {
@@ -133,9 +133,9 @@ function coinSelectCore(settings: ITxPlanSettings): IUTXO[] {
     throw new Error("Insufficient funds");
   }
 
-  return bestSolution.utxos as IUTXO[];
+  return bestSolution.utxos as IBaseUTXO[];
 }
-function coinSelectP2PKH(address: string, feeRate: number, utxos: IUTXO[], outputs: ITransactionOutputAddress[]): ICreateP2PKHParams & {fee: number} {
+function coinSelectP2PKH(address: string, feeRate: number, utxos: IBaseUTXO[], outputs: ITransactionOutputAddress[]): ICreateP2PKHParams & {fee: number} {
   const inputScriptLength = P2PKH_INPUT_SCRIPT_LENGTH;
   const outputSelfScriptLength = P2PKH_OUTPUT_SCRIPT_LENGTH;
   const settings: ITxPlanSettings = {

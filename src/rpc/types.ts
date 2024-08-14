@@ -24,6 +24,9 @@ interface IDogeLinkRPC {
   resolveBlockNumber(blockHashOrNumber: string | number): Promise<number>;
   getFeeEstimateMap(): Promise<IFeeEstimateMap>;
   estimateSmartFee(target: number): Promise<number>;
+  estimateSmartFeeOrFallback(target: number, fallbackFeeRate: number): Promise<number>;
+  getFeeEstimateMapOrFallback(fallbackFeeRate: number): Promise<IFeeEstimateMap>;
+
   waitForTransaction(txid: string, waitUntilConfirmed?: boolean, pollInterval?: number, maxAttempts?: number): Promise<ITransactionWithStatus>;
 }
 interface IFeeEstimateMap {

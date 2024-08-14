@@ -63,7 +63,7 @@ class DogeMemoryWallet implements IDogeTransactionSigner{
 
   static fromWIF(wif: string, networkId?: DogeNetworkId, name?: string){
     const { privateKey, networkId: networkIdFromWIF } = decodePrivateKeyAndNetworkFromWIF(wif, networkId);
-    return new DogeMemoryWallet(privateKey, networkIdFromWIF, name);
+    return new DogeMemoryWallet(privateKey, networkId || networkIdFromWIF, name);
   }
   getWalletForOtherNetwork(networkId: DogeNetworkId){
     return new DogeMemoryWallet(this.privateKey, networkId, this.name);

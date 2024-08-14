@@ -40,6 +40,21 @@ class DogeLinkElectrsComboRPC implements IDogeLinkElectrsRPC {
     );
     this.electrsRPC = electrsRPC;
   }
+  estimateSmartFeeOrFallback(target: number, fallbackFeeRate: number): Promise<number> {
+    return this.estimateSmartFee(target).catch(() => fallbackFeeRate);
+  }
+  async getFeeEstimateMapOrFallback(fallbackFeeRate: number): Promise<IFeeEstimateMap> {
+    try {
+      const feeMap = await this.getFeeEstimateMap();
+      return feeMap;
+    }catch(e){
+      const fallback: any = {};
+      for(let i=1; i<=25; i++){
+        fallback[i+''] = fallbackFeeRate;
+      }
+      return fallback;
+    }
+  }
   getTransactionWithStatus(txid: string): Promise<ITransactionWithStatus> {
     return this.electrsRPC.getTransactionWithStatus(txid);
   }

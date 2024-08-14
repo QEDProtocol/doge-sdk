@@ -25,6 +25,21 @@ class DogeLinkRPC implements IDogeLinkRPC {
     }
     this.httpClient = httpClient || (new FetchHTTPClient());
   }
+  estimateSmartFeeOrFallback(target: number, fallbackFeeRate: number): Promise<number> {
+    return this.estimateSmartFee(target).catch(() => fallbackFeeRate);
+  }
+  async getFeeEstimateMapOrFallback(fallbackFeeRate: number): Promise<IFeeEstimateMap> {
+    try {
+      const feeMap = await this.getFeeEstimateMap();
+      return feeMap;
+    }catch(e){
+      const fallback: any = {};
+      for(let i=1; i<=25; i++){
+        fallback[i+''] = fallbackFeeRate;
+      }
+      return fallback;
+    }
+  }
   async getTransactionWithStatus(txid: string): Promise<ITransactionWithStatus> {
     const response = await this.command<IDogeRPCGetRawTxResponse>("getrawtransaction", [txid, 1]);
     const tx = Transaction.fromHex(response.hex);

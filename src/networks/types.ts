@@ -13,6 +13,11 @@ interface IDogeNetwork {
   scriptHash: number;
   wif: number;
   networkId: DogeNetworkId;
+  powLimit: string;
+  fPowAllowMinDifficultyBlocks: boolean;
+  fPowNoRetargeting: boolean;
+  nPowTargetTimespan: number;
+  nPowTargetSpacing: number;
 }
 export type {
   IDogeNetwork,

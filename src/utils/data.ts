@@ -36,6 +36,19 @@ function hexToU8Array(hex: string): Uint8Array {
   return output;
 }
 
+function reverseHexString(hex: string): string {
+  assertIsHexString(hex);
+  let hexString = hex.charAt(1) === "x" ? hex.substring(2) : hex;
+  if ((hexString.length & 1) === 1) {
+    throw new Error("hex strings must have an even number of characters");
+  }
+  const outputLength = hexString.length / 2;
+  const output: string[] = [];
+  for (let i = outputLength-1; i >= 0; i--) {
+    output.push(hexString.substring(i * 2, i * 2 + 2));
+  }
+  return output.join("");
+}
 function hexToU8ArrayReversed(hex: string): Uint8Array {
   assertIsHexString(hex);
   let hexString = hex.charAt(1) === "x" ? hex.substring(2) : hex;
@@ -71,4 +84,5 @@ export {
   u8ArrayToHexReversed,
   isHexString,
   assertIsHexString,
+  reverseHexString,
 }

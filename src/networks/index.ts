@@ -11,6 +11,11 @@ const doge: IDogeNetwork = {
   scriptHash: 0x16,
   wif: 0x9e,
   networkId: "doge",
+  powLimit: "0x00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  fPowAllowMinDifficultyBlocks: false,
+  fPowNoRetargeting: false,
+  nPowTargetTimespan: 60,
+  nPowTargetSpacing: 60,
 };
 const dogeRegtest: IDogeNetwork = {
   messagePrefix: '\x19Dogecoin Signed Message:\n',
@@ -23,6 +28,11 @@ const dogeRegtest: IDogeNetwork = {
   scriptHash: 0xc4,
   wif: 0xef,
   networkId: "dogeRegtest",
+  powLimit: "0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  fPowAllowMinDifficultyBlocks: true,
+  fPowNoRetargeting: true,
+  nPowTargetTimespan: 60,
+  nPowTargetSpacing: 60,
 };
 const dogeTestnet: IDogeNetwork = {
   messagePrefix: '\x19Dogecoin Signed Message:\n',
@@ -35,6 +45,11 @@ const dogeTestnet: IDogeNetwork = {
   scriptHash: 0xc4,
   wif: 0xf1,
   networkId: "dogeTestnet",
+  powLimit: "0x00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  fPowAllowMinDifficultyBlocks: true,
+  fPowNoRetargeting: false,
+  nPowTargetTimespan: 60,
+  nPowTargetSpacing: 60,
 };
 
 const dogeNetworks = {

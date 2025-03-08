@@ -15,5 +15,15 @@ describe('Block Serialization', () => {
         expect(blk.auxData.coinbaseTransaction.toHex()).toEqual(block.block.auxpow?.tx.hex);
       }
     });
+    it('deserialize/serialize json block '+block.blockNumber, () => {
+      const blk = Block.fromHex(block.rawBlock);
+      const blockJSONString = JSON.stringify(blk.toBlockJSON());
+      const blockJSON = JSON.parse(blockJSONString);
+      const reserializedBlock = Block.fromBlockJSON(blockJSON);
+
+      expect(blk.getBlockHash()).toBe(reserializedBlock.getBlockHash());
+      expect(blk.toHex()).toBe(reserializedBlock.toHex());
+      expect(blockJSONString).toBe(JSON.stringify(reserializedBlock.toBlockJSON()));
+    });
   });
 });

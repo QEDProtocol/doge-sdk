@@ -26,6 +26,9 @@ export type {
 export * from './transaction';
 
 export type {
+  THash256,
+  THexString,
+  
   ITransactionInputWithoutScript,
   ITransactionInput,
   ITransactionOutput,
@@ -33,6 +36,12 @@ export type {
   ISigHashPreimage,
   ITransactionOutputUser,
   ITransactionOutputAddress,
+
+  ITransactionInputWithoutScriptJSON,
+  ITransactionInputJSON,
+  ITransactionOutputJSON,
+  ITransactionOutputUserJSON,
+  ITransactionJSON,
 } from './transaction/types';
 export * from './transaction/constants';
 

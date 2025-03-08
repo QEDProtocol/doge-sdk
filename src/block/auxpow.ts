@@ -2,7 +2,7 @@ import { Transaction } from '../transaction';
 import { BytesBuilder } from '../utils/bytesBuilder';
 import { BytesReader } from '../utils/bytesReader';
 import { hexToU8Array, u8ArrayToHex } from '../utils/data';
-import { IMerkleBranch, IStandardBlockHeader } from './types';
+import type { IAuxPow, IAuxPowJSON, IMerkleBranch, IStandardBlockHeader } from './types';
 import {
   merkleBranchEncodingLength,
   readMerkleBranch,
@@ -11,12 +11,22 @@ import {
   writeStandardBlockHeader,
 } from './utils';
 
-class AuxPow {
+class AuxPow implements IAuxPow {
   coinbaseTransaction: Transaction;
   blockHash: string;
   coinbaseBranch: IMerkleBranch;
   blockchainBranch: IMerkleBranch;
   parentBlock: IStandardBlockHeader;
+
+  static fromBase(data: IAuxPow): AuxPow {
+    return (data instanceof AuxPow) ? data : new AuxPow(
+      Transaction.fromBase(data.coinbaseTransaction),
+      data.blockHash,
+      data.coinbaseBranch,
+      data.blockchainBranch,
+      data.parentBlock,
+    )
+  }
 
   constructor(
     coinbaseTransaction: Transaction,
@@ -83,6 +93,25 @@ class AuxPow {
       blockchainBranch,
       parentBlock
     );
+  }
+  toAuxPowJSON(): IAuxPowJSON {
+    return {
+      coinbaseTransaction: this.coinbaseTransaction.toTxJSON(),
+      blockHash: this.blockHash,
+      coinbaseBranch: this.coinbaseBranch,
+      blockchainBranch: this.blockchainBranch,
+      parentBlock: this.parentBlock,
+    }
+  }
+
+  static fromAuxPowJSON(auxPowJSON: IAuxPowJSON): AuxPow {
+    return AuxPow.fromBase({
+      coinbaseTransaction: Transaction.fromTxJSON(auxPowJSON.coinbaseTransaction),
+      blockHash: auxPowJSON.blockHash,
+      coinbaseBranch: auxPowJSON.coinbaseBranch,
+      blockchainBranch: auxPowJSON.blockchainBranch,
+      parentBlock: auxPowJSON.parentBlock,
+    });
   }
 }
 

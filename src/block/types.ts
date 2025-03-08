@@ -1,4 +1,21 @@
-import { AuxPow } from "./auxpow";
+import type { ITransaction, ITransactionJSON } from "../transaction/types";
+
+interface IAuxPow {
+  coinbaseTransaction: ITransaction;
+  blockHash: string;
+  coinbaseBranch: IMerkleBranch;
+  blockchainBranch: IMerkleBranch;
+  parentBlock: IStandardBlockHeader;
+}
+
+
+interface IAuxPowJSON {
+  coinbaseTransaction: ITransactionJSON;
+  blockHash: string;
+  coinbaseBranch: IMerkleBranch;
+  blockchainBranch: IMerkleBranch;
+  parentBlock: IStandardBlockHeader;
+}
 
 interface IStandardBlockHeader {
   version: number;
@@ -10,7 +27,18 @@ interface IStandardBlockHeader {
 }
 
 interface IStandardBlockHeaderAuxPow extends IStandardBlockHeader {
-  auxData?: AuxPow;
+  auxData?: IAuxPow;
+}
+interface IStandardBlockHeaderAuxPowJSON extends IStandardBlockHeader {
+  auxData?: IAuxPowJSON;
+}
+
+interface IStandardBlockAuxPow extends IStandardBlockHeaderAuxPow {
+  transactions: ITransaction[];
+}
+
+interface IStandardBlockAuxPowJSON extends IStandardBlockHeaderAuxPowJSON {
+  transactions: ITransactionJSON[];
 }
 
 interface IMerkleBranch {
@@ -19,7 +47,12 @@ interface IMerkleBranch {
 }
 
 export type {
+  IAuxPow,
+  IAuxPowJSON,
   IStandardBlockHeader,
   IMerkleBranch,
   IStandardBlockHeaderAuxPow,
+  IStandardBlockHeaderAuxPowJSON,
+  IStandardBlockAuxPow,
+  IStandardBlockAuxPowJSON,
 }

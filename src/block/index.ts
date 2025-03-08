@@ -5,11 +5,13 @@ import { BytesReader } from '../utils/bytesReader';
 import { hexToU8Array, u8ArrayToHex, u8ArrayToHexReversed } from '../utils/data';
 import { varuintEncodingLength } from '../utils/varuint';
 import { AuxPow } from './auxpow';
+import { VERSION_AUXPOW } from './constants';
 import { BlockHeader } from './header';
-import type { IMerkleBranch, IStandardBlockHeader, IStandardBlockHeaderAuxPow } from './types';
-import { writeStandardBlockHeader } from './utils';
+import { getNextWorkRequired, getNextWorkRequiredModern } from './pow';
+import type { IAuxPow, IAuxPowJSON, IMerkleBranch, IStandardBlockAuxPow, IStandardBlockAuxPowJSON, IStandardBlockHeader, IStandardBlockHeaderAuxPow, IStandardBlockHeaderAuxPowJSON } from './types';
+import { getTargetForBits, writeStandardBlockHeader } from './utils';
 
-class Block implements IStandardBlockHeaderAuxPow {
+class Block implements IStandardBlockAuxPow {
   version: number = 1;
   prevHash: string = '';
   merkleRoot: string = '';
@@ -19,6 +21,7 @@ class Block implements IStandardBlockHeaderAuxPow {
   auxData?: AuxPow;
 
   transactions: Transaction[] = [];
+
 
   getBlockHeader(): BlockHeader {
     return new BlockHeader(this);
@@ -54,6 +57,89 @@ class Block implements IStandardBlockHeaderAuxPow {
   }
   toHex(): string {
     return u8ArrayToHex(this.toBuffer());
+  }
+
+  toBlockJSON(): IStandardBlockAuxPowJSON {
+    const base: IStandardBlockAuxPowJSON = {
+      version: this.version,
+      prevHash: this.prevHash,
+      merkleRoot: this.merkleRoot,
+      timestamp: this.timestamp,
+      bits: this.bits,
+      nonce: this.nonce,
+      transactions: this.transactions.map(x => x.toTxJSON()),
+    };
+    if (this.auxData) {
+      base.auxData = this.auxData.toAuxPowJSON();
+    }
+    return base;
+  }
+  
+  getTarget(): bigint {
+    return getTargetForBits(this.bits);
+  }
+  
+
+  isNull(): boolean {
+    return this.bits === 0;
+  }
+  getBaseVersion(): number {
+    return this.version % VERSION_AUXPOW;
+  }
+  getChainId(): number {
+    return this.version >>> 16;
+  }
+  isAuxPow(): boolean {
+    return (this.version & VERSION_AUXPOW) !== 0;
+  }
+  isLegacy(): boolean {
+    return this.version === 1
+      // Dogecoin: We have a random v2 block with no AuxPoW, treat as legacy
+      || (this.version === 2 && this.getChainId() == 0);
+  }
+
+  static fromBlockJSON({
+    version,
+    prevHash,
+    merkleRoot,
+    timestamp,
+    bits,
+    nonce,
+    auxData,
+    transactions,
+  }: IStandardBlockAuxPowJSON): Block {
+    const block = new Block();
+    block.version = version;
+    block.prevHash = prevHash;
+    block.merkleRoot = merkleRoot;
+    block.timestamp = timestamp;
+    block.bits = bits;
+    block.nonce = nonce;
+    block.auxData = auxData ? AuxPow.fromAuxPowJSON(auxData) : undefined;
+    block.transactions = transactions.map(tx => Transaction.fromTxJSON(tx));
+    return block;
+  }
+
+  static fromBase({
+    version,
+    prevHash,
+    merkleRoot,
+    timestamp,
+    bits,
+    nonce,
+    auxData,
+    transactions,
+  }: IStandardBlockAuxPow): Block {
+    const block = new Block();
+    block.version = version;
+    block.prevHash = prevHash;
+    block.merkleRoot = merkleRoot;
+    block.timestamp = timestamp;
+    block.bits = bits;
+    block.nonce = nonce;
+    block.auxData = auxData ? AuxPow.fromBase(auxData) : undefined;
+    block.transactions = transactions.map(tx => tx instanceof Transaction ? tx : Transaction.fromBase(tx));
+    return block;
   }
 
   static fromBytesReader(reader: BytesReader): Block {
@@ -97,11 +183,18 @@ class Block implements IStandardBlockHeaderAuxPow {
 export {
   Block,
   BlockHeader,
-  AuxPow
+  AuxPow,
+  getNextWorkRequiredModern,
+  getNextWorkRequired,
 };
 
 export type {
+  IAuxPow,
+  IAuxPowJSON,
   IStandardBlockHeader,
   IMerkleBranch,
   IStandardBlockHeaderAuxPow,
+  IStandardBlockHeaderAuxPowJSON,
+  IStandardBlockAuxPow,
+  IStandardBlockAuxPowJSON,
 };

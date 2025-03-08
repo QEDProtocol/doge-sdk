@@ -6,11 +6,13 @@ import { BytesReader } from "../utils/bytesReader";
 import { compareU8Array, hexToU8Array, u8ArrayToHex, u8ArrayToHexReversed } from "../utils/data";
 import { varSliceEncodingLength, varuintEncodingLength, vectorEncodingLength } from "../utils/varuint";
 import { ADVANCED_TRANSACTION_FLAG, ADVANCED_TRANSACTION_MARKER } from "./constants";
+import { txJSONToTx, txToTxJSON } from "./normalize";
 import { getSigHashForTx, prepareSighashPreimagePreSegwit } from "./sighash";
 import {
   ITransaction,
   ITransactionInput,
   ITransactionInputWithoutScript,
+  ITransactionJSON,
   ITransactionOutput,
 } from "./types";
 
@@ -61,15 +63,15 @@ class Transaction implements ITransaction {
   }
   getUTXOsForAddress(address: string): IBaseUTXO[] {
     const vouts = this.getVoutsForAddress(address);
-    if(vouts.length === 0) return [];
+    if (vouts.length === 0) return [];
 
     const txid = u8ArrayToHexReversed(hashBuffer("hash256", this.toBuffer()));
-    return vouts.map(vout => ({value: this.outputs[vout].value, vout, txid}));
+    return vouts.map(vout => ({ value: this.outputs[vout].value, vout, txid }));
   }
 
   hasWitnesses() {
-    for(const txIn of this.inputs){
-      if(typeof txIn.witness === "object" && Array.isArray(txIn.witness) && txIn.witness.length !== 0){
+    for (const txIn of this.inputs) {
+      if (typeof txIn.witness === "object" && Array.isArray(txIn.witness) && txIn.witness.length !== 0) {
         return true;
       }
     }
@@ -93,7 +95,7 @@ class Transaction implements ITransaction {
       return acc + 8 + varSliceEncodingLength(output.script);
     }, 0);
     const witnessesSize = hasWitnesses ? this.inputs.reduce((acc, input) => {
-      return acc + (input.witness?vectorEncodingLength(input.witness):0);
+      return acc + (input.witness ? vectorEncodingLength(input.witness) : 0);
     }, 0) : 0;
     return headerSize + inputsSize + outputsSize + witnessesSize;
   }
@@ -133,14 +135,14 @@ class Transaction implements ITransaction {
       builder.writeVarSlice(output.script);
     });
 
-    if(hasWitnesses){
-      this.inputs.forEach((input)=>{
-        builder.writeVector(input.witness||[]);
+    if (hasWitnesses) {
+      this.inputs.forEach((input) => {
+        builder.writeVector(input.witness || []);
       });
     }
 
     builder.writeUint32(this.locktime);
-    if (isSigHash&&typeof sigHashType === "number") {
+    if (isSigHash && typeof sigHashType === "number") {
       builder.writeUint32(sigHashType);
     }
     return builder;
@@ -156,17 +158,17 @@ class Transaction implements ITransaction {
     return this.writeToBytesBuilder(builder, allowWitness, sigHashType).toBuffer();
   }
 
-  toDisplay(){
+  toDisplay() {
     return {
       version: this.version,
-      inputs: this.inputs.map(input=>({
+      inputs: this.inputs.map(input => ({
         hash: u8ArrayToHexReversed(input.hash),
         index: input.index,
         script: u8ArrayToHex(input.script),
         sequence: input.sequence,
-        witness: input.witness?input.witness.map(x=>u8ArrayToHex(x)):null
+        witness: input.witness ? input.witness.map(x => u8ArrayToHex(x)) : null
       })),
-      outputs: this.outputs.map(output=>({
+      outputs: this.outputs.map(output => ({
         value: output.value,
         script: u8ArrayToHex(output.script)
       })),
@@ -176,13 +178,13 @@ class Transaction implements ITransaction {
   toBuffer(allowWitness = false) {
     return this.toBufferInternal(allowWitness, null);
   }
-  toHex(){
+  toHex() {
     return u8ArrayToHex(this.toBuffer());
   }
   toSighashBuffer(sigHashType: number) {
     return this.toBufferInternal(false, sigHashType);
   }
-  getTxid(){
+  getTxid() {
     return u8ArrayToHexReversed(hashBuffer("hash256", this.toBuffer()));
   }
   getSigHash(
@@ -271,30 +273,36 @@ class Transaction implements ITransaction {
     const locktime = reader.readUint32();
     const tx = new Transaction(inputs, outputs, locktime, version);
 
-    if(hasWitnesses && !tx.hasWitnesses()){
+    if (hasWitnesses && !tx.hasWitnesses()) {
       throw new Error("transaction has unnecessary witness data");
     }
 
     return tx;
   }
-  getSighashInputIndex(){
+  getSighashInputIndex() {
     const nonEmptyIndexes = this.inputs
-      .map((input, index) => ({input, index}))
-      .filter(({input}) => input.script.length !== 0);
+      .map((input, index) => ({ input, index }))
+      .filter(({ input }) => input.script.length !== 0);
     return nonEmptyIndexes.length !== 1 ? -1 : nonEmptyIndexes[0].index;
   }
-  getSigHashConfig(): {isP2PKH: boolean, inputIndex: number} {
+  getSigHashConfig(): { isP2PKH: boolean, inputIndex: number } {
     const index = this.getSighashInputIndex();
-    if(index === -1) return {isP2PKH: false, inputIndex: -1};
-    return {isP2PKH: isP2PKHOutputScript(this.inputs[index].script), inputIndex: index};
+    if (index === -1) return { isP2PKH: false, inputIndex: -1 };
+    return { isP2PKH: isP2PKHOutputScript(this.inputs[index].script), inputIndex: index };
   }
   static fromBase(base: ITransaction) {
-    return new Transaction(
+    return base instanceof Transaction ? base : new Transaction(
       base.inputs.map((input) => ({ ...input })),
       base.outputs.map((output) => ({ ...output })),
       base.locktime,
       base.version
     );
+  }
+  toTxJSON(): ITransactionJSON {
+    return txToTxJSON(this);
+  }
+  static fromTxJSON(txJSON: ITransactionJSON): Transaction {
+    return Transaction.fromBase(txJSONToTx(txJSON))
   }
 }
 export { Transaction };
